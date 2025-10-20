@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест Reduxion Launcher</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #000 0%, #0a0a0a 50%, #000 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .test-container {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(232, 28, 90, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            max-width: 600px;
+        }
+
+        .test-logo {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(45deg, #e81c5a, #ad1457);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: #fff;
+            margin: 0 auto 30px auto;
+            box-shadow: 0 10px 30px rgba(232, 28, 90, 0.4);
+        }
+
+        .test-title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #e81c5a;
+            margin-bottom: 20px;
+        }
+
+        .test-status {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .status-item {
+            margin: 10px 0;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            font-family: 'Montserrat', sans-serif;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #e81c5a, #ad1457);
+            color: #fff;
+            box-shadow: 0 5px 20px rgba(232, 28, 90, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(232, 28, 90, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-3px);
+        }
+
+        .log {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-logo">
+            <i class="fas fa-rocket"></i>
+        </div>
+
+        <h1 class="test-title">Reduxion Launcher</h1>
+        <p>Тестовая страница для проверки функциональности</p>
+
+        <div class="test-status">
+            <div class="status-item">
+                <strong>Статус:</strong> <span id="status">Загрузка...</span>
+            </div>
+            <div class="status-item">
+                <strong>Время:</strong> <span id="time"></span>
+            </div>
+            <div class="status-item">
+                <strong>Electron API:</strong> <span id="electron-status">Проверка...</span>
+            </div>
+        </div>
+
+        <div>
+            <button class="btn btn-primary" onclick="testElectronAPI()">
+                <i class="fas fa-vial"></i>
+                Тест API
+            </button>
+            <button class="btn btn-secondary" onclick="loadMainApp()">
+                <i class="fas fa-rocket"></i>
+                Загрузить лаунчер
+            </button>
+        </div>
+
+        <div class="log" id="log"></div>
+    </div>
+
+    <script>
+        function log(message) {
+            const logContainer = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logContainer.innerHTML += `[${timestamp}] ${message}\n`;
+            console.log(message);
+        }
+
+        function updateTime() {
+            document.getElementById('time').textContent = new Date().toLocaleString('ru-RU');
+        }
+
+        // Тест Electron API
+        async function testElectronAPI() {
+            try {
+                log('Тестирование Electron API...');
+
+                if (typeof require === 'function') {
+                    log('API require: Доступен');
+
+                    try {
+                        const { ipcRenderer } = require('electron');
+                        log('ipcRenderer: Доступен');
+
+                        document.getElementById('electron-status').textContent = 'Работает';
+                        document.getElementById('status').textContent = 'Готов';
+
+                        log('Electron API работает корректно');
+                    } catch (error) {
+                        log('Ошибка ipcRenderer: ' + error.message);
+                        document.getElementById('electron-status').textContent = 'Ошибка: ' + error.message;
+                    }
+                } else {
+                    log('API require: Не доступен');
+                    document.getElementById('electron-status').textContent = 'Не доступен';
+                }
+            } catch (error) {
+                log('Ошибка тестирования: ' + error.message);
+            }
+        }
+
+        // Загрузка основного приложения
+        function loadMainApp() {
+            try {
+                log('Попытка загрузки основного приложения...');
+                window.location.href = 'modern-launcher.html';
+            } catch (error) {
+                log('Ошибка загрузки: ' + error.message);
+            }
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            log('Тестовая страница загружена');
+            updateTime();
+            setInterval(updateTime, 1000);
+
+            // Автоматический тест через 2 секунды
+            setTimeout(() => {
+                testElectronAPI();
+            }, 2000);
+        });
+
+        // Обработчики ошибок
+        window.addEventListener('error', (event) => {
+            log('Ошибка окна: ' + event.error.message);
+        });
+
+        window.addEventListener('unhandledrejection', (event) => {
+            log('Необработанный промис: ' + event.reason);
+        });
+    </script>
+</body>
+</html>

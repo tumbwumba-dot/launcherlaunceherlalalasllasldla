@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reduxion Launcher - Majestic Style</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="launcher-majestic.css">
+    <style display="none">
+        /* Design System */
+        :root {
+            --primary: #E91E63;
+            --primary-dark: #C2185B;
+            --secondary: #9C27B0;
+            --bg-primary: #0A0A0F;
+            --bg-secondary: #151520;
+            --bg-card: #252535;
+            --text-primary: #FFFFFF;
+            --text-secondary: #B8B8D0;
+            --gradient-primary: linear-gradient(135deg, #E91E63 0%, #9C27B0 100%);
+            --gradient-secondary: linear-gradient(135deg, #FF5722 0%, #E91E63 100%);
+            --shadow-glow: 0 0 20px rgba(233, 30, 99, 0.3);
+            --radius-md: 12px;
+            --radius-lg: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+        }
+
+        .launcher-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 80px;
+            background: var(--bg-secondary);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 0;
+        }
+
+        .sidebar-logo {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 900;
+            margin-bottom: 40px;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .nav-button {
+            width: 48px;
+            height: 48px;
+            background: transparent;
+            border: none;
+            border-radius: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .nav-button:hover,
+        .nav-button.active {
+            background: rgba(233, 30, 99, 0.1);
+            color: var(--primary);
+        }
+
+        .nav-button.active::before {
+            content: '';
+            position: absolute;
+            left: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 24px;
+            background: var(--gradient-primary);
+            border-radius: 2px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .launcher-header {
+            padding: 24px 32px;
+            background: rgba(21, 21, 32, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .online-badge {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            font-weight: 600;
+        }
+
+        .pulse {
+            width: 8px;
+            height: 8px;
+            background: #4CAF50;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            padding: 32px;
+            overflow-y: auto;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        .badge {
+            padding: 6px 12px;
+            background: rgba(233, 30, 99, 0.1);
+            color: var(--primary);
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* Server Grid */
+        .servers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .server-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .server-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+
+        .server-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .server-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .server-card.recommended {
+            border-color: var(--primary);
+        }
+
+        .server-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: var(--gradient-primary);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .server-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .server-icon {
+            width: 56px;
+            height: 56px;
+            background: var(--gradient-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .server-info {
+            flex: 1;
+        }
+
+        .server-name {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .server-players {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .status-online {
+            width: 6px;
+            height: 6px;
+            background: #4CAF50;
+            border-radius: 50%;
+        }
+
+        .player-count {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .server-description {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .server-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .tag {
+            padding: 4px 12px;
+            background: rgba(233, 30, 99, 0.1);
+            color: var(--primary);
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .server-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-play {
+            flex: 1;
+            padding: 12px;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: var(--radius-md);
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-play:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .btn-settings {
+            width: 48px;
+            height: 48px;
+            background: var(--bg-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-settings:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Status Panel */
+        .status-panel {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .status-item {
+            text-align: center;
+        }
+
+        .status-value {
+            font-size: 28px;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .status-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gradient-primary);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="launcher-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">R</div>
+            
+            <nav class="sidebar-nav">
+                <button class="nav-button active" title="Серверы">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="3" width="20" height="6" rx="2"/>
+                        <rect x="2" y="15" width="20" height="6" rx="2"/>
+                        <circle cx="6" cy="6" r="1" fill="currentColor"/>
+                        <circle cx="6" cy="18" r="1" fill="currentColor"/>
+                    </svg>
+                </button>
+
+                <button class="nav-button" title="Библиотека">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                    </svg>
+                </button>
+
+                <button class="nav-button" title="Сообщество">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                </button>
+
+                <button class="nav-button" title="Загрузки">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                </button>
+            </nav>
+
+            <button class="nav-button" title="Настройки">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"/>
+                </svg>
+            </button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="launcher-header">
+                <h1 class="header-title">
+                    <span style="background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Reduxion</span> Launcher
+                </h1>
+                
+                <div class="online-badge">
+                    <span class="pulse"></span>
+                    <span>Сейчас играют: <strong style="color: var(--primary);">9,403</strong></span>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="content-area">
+                <!-- Recommended Section -->
+                <div class="section-header">
+                    <h2 class="section-title">💎 СОВЕТУЕМ ДЛЯ НОВИЧКОВ</h2>
+                    <span class="badge">ПОПУЛЯРНОЕ</span>
+                </div>
+
+                <div class="servers-grid">
+                    <div class="server-card recommended">
+                        <div class="server-badge">Рекомендуем</div>
+                        
+                        <div class="server-header">
+                            <div class="server-icon">🏙️</div>
+                            <div class="server-info">
+                                <h3 class="server-name">Atlanta</h3>
+                                <div class="server-players">
+                                    <span class="status-online"></span>
+                                    <span><span class="player-count">2,847</span> / 4,000 игроков</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class="server-description">
+                            Самый популярный сервер для начинающих с дружелюбным комьюнити и регулярными ивентами.
+                        </p>
+
+                        <div class="server-tags">
+                            <span class="tag">Новичкам</span>
+                            <span class="tag">Активный</span>
+                            <span class="tag">RU</span>
+                        </div>
+
+                        <div class="server-actions">
+                            <button class="btn-play" onclick="playServer('atlanta')">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M4 2L16 10L4 18V2Z"/>
+                                </svg>
+                                Играть
+                            </button>
+                            <button class="btn-settings">⚙️</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- All Servers -->
+                <div class="section-header">
+                    <h2 class="section-title">🌐 ВСЕ СЕРВЕРЫ</h2>
+                </div>
+
+                <div class="servers-grid">
+                    <div class="server-card">
+                        <div class="server-header">
+                            <div class="server-icon" style="background: linear-gradient(135deg, #FF5722 0%, #E91E63 100%);">🔥</div>
+                            <div class="server-info">
+                                <h3 class="server-name">Phoenix</h3>
+                                <div class="server-players">
+                                    <span class="status-online"></span>
+                                    <span><span class="player-count">1,923</span> / 4,000 игроков</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class="server-description">
+                            Сервер для опытных игроков с хардкорным геймплеем и строгими правилами RP.
+                        </p>
+
+                        <div class="server-tags">
+                            <span class="tag">Хардкор</span>
+                            <span class="tag">RP</span>
+                            <span class="tag">RU</span>
+                        </div>
+
+                        <div class="server-actions">
+                            <button class="btn-play" onclick="playServer('phoenix')">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M4 2L16 10L4 18V2Z"/>
+                                </svg>
+                                Играть
+                            </button>
+                            <button class="btn-settings">⚙️</button>
+                        </div>
+                    </div>
+
+                    <div class="server-card">
+                        <div class="server-header">
+                            <div class="server-icon" style="background: linear-gradient(135deg, #9C27B0 0%, #673AB7 100%);">⭐</div>
+                            <div class="server-info">
+                                <h3 class="server-name">Dallas</h3>
+                                <div class="server-players">
+                                    <span class="status-online"></span>
+                                    <span><span class="player-count">3,156</span> / 4,000 игроков</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class="server-description">
+                            Баланс между новичками и профи, идеально подходит для всех уровней игры.
+                        </p>
+
+                        <div class="server-tags">
+                            <span class="tag">Баланс</span>
+                            <span class="tag">Популярный</span>
+                            <span class="tag">RU</span>
+                        </div>
+
+                        <div class="server-actions">
+                            <button class="btn-play" onclick="playServer('dallas')">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M4 2L16 10L4 18V2Z"/>
+                                </svg>
+                                Играть
+                            </button>
+                            <button class="btn-settings">⚙️</button>
+                        </div>
+                    </div>
+
+                    <div class="server-card">
+                        <div class="server-header">
+                            <div class="server-icon" style="background: linear-gradient(135deg, #FF9800 0%, #FF5722 100%);">🎰</div>
+                            <div class="server-info">
+                                <h3 class="server-name">Las Vegas</h3>
+                                <div class="server-players">
+                                    <span class="status-online"></span>
+                                    <span><span class="player-count">2,477</span> / 4,000 игроков</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class="server-description">
+                            Казино, развлечения и большие заработки в городе возможностей.
+                        </p>
+
+                        <div class="server-tags">
+                            <span class="tag">Казино</span>
+                            <span class="tag">Бизнес</span>
+                            <span class="tag">RU</span>
+                        </div>
+
+                        <div class="server-actions">
+                            <button class="btn-play" onclick="playServer('vegas')">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M4 2L16 10L4 18V2Z"/>
+                                </svg>
+                                Играть
+                            </button>
+                            <button class="btn-settings">⚙️</button>
+                        </div>
+                    </div>
+
+                    <div class="server-card">
+                        <div class="server-header">
+                            <div class="server-icon" style="background: linear-gradient(135deg, #00BCD4 0%, #2196F3 100%);">🏖️</div>
+                            <div class="server-info">
+                                <h3 class="server-name">San Diego</h3>
+                                <div class="server-players">
+                                    <span class="status-online"></span>
+                                    <span><span class="player-count">2,104</span> / 4,000 игроков</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class="server-description">
+                            Спокойный сервер у океана с уклоном в легальный бизнес и туризм.
+                        </p>
+
+                        <div class="server-tags">
+                            <span class="tag">Легальный</span>
+                            <span class="tag">Бизнес</span>
+                            <span class="tag">RU</span>
+                        </div>
+
+                        <div class="server-actions">
+                            <button class="btn-play" onclick="playServer('sandiego')">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M4 2L16 10L4 18V2Z"/>
+                                </svg>
+                                Играть
+                            </button>
+                            <button class="btn-settings">⚙️</button>
+                        </div>
+                    </div>
+
+                    <div class="server-card">
+                        <div class="server-header">
+                            <div class="server-icon" style="background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);">🏛️</div>
+                            <div class="server-info">
+                                <h3 class="server-name">Boston</h3>
+                                <div class="server-players">
+                                    <span class="status-online"></span>
+                                    <span><span class="player-count">1,896</span> / 4,000 игроков</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class="server-description">
+                            Исторический сервер с акцентом на политику и общественную деятельность.
+                        </p>
+
+                        <div class="server-tags">
+                            <span class="tag">Политика</span>
+                            <span class="tag">RP</span>
+                            <span class="tag">RU</span>
+                        </div>
+
+                        <div class="server-actions">
+                            <button class="btn-play" onclick="playServer('boston')">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M4 2L16 10L4 18V2Z"/>
+                                </svg>
+                                Играть
+                            </button>
+                            <button class="btn-settings">⚙️</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status -->
+                <div class="section-header" style="margin-top: 32px;">
+                    <h2 class="section-title">📊 СТАТИСТИКА</h2>
+                </div>
+
+                <div class="status-panel">
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <div class="status-value">12,403</div>
+                            <div class="status-label">Игроков онлайн</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-value">99.9%</div>
+                            <div class="status-label">Uptime серверов</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-value">50+</div>
+                            <div class="status-label">Редуксов</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        function playServer(serverName) {
+            console.log('Playing server:', serverName);
+            // Здесь будет логика запуска сервера
+            ipcRenderer.invoke('launch-game', { server: serverName });
+        }
+
+        // Анимация появления карточек
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.server-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

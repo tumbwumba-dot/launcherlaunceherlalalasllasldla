@@ -1,0 +1,42 @@
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e81c5a;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#ff6b8a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e81c5a;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0.7" />
+    </linearGradient>
+  </defs>
+
+  <!-- Фон -->
+  <circle cx="128" cy="128" r="128" fill="url(#gradient1)"/>
+
+  <!-- Внутренний круг -->
+  <circle cx="128" cy="128" r="110" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+
+  <!-- Центральная фигура - стилизованная ракета/молния -->
+  <g transform="translate(128, 128)">
+    <!-- Основная форма -->
+    <path d="M -40,-60 L 0,-80 L 40,-60 L 20,0 L 40,60 L 0,40 L -40,60 L -20,0 Z"
+          fill="url(#gradient2)" opacity="0.9"/>
+
+    <!-- Акцентные линии -->
+    <path d="M -25,-40 L 0,-55 L 25,-40 L 15,0 L 25,40 L 0,25 L -25,40 L -15,0 Z"
+          fill="rgba(255,255,255,0.3)"/>
+
+    <!-- Центральная точка -->
+    <circle cx="0" cy="0" r="8" fill="#e81c5a" opacity="0.8"/>
+    <circle cx="0" cy="0" r="4" fill="white"/>
+  </g>
+
+  <!-- Декоративные элементы -->
+  <g opacity="0.3">
+    <circle cx="60" cy="60" r="3" fill="white"/>
+    <circle cx="196" cy="60" r="3" fill="white"/>
+    <circle cx="60" cy="196" r="3" fill="white"/>
+    <circle cx="196" cy="196" r="3" fill="white"/>
+  </g>
+</svg>

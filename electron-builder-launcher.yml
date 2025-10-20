@@ -1,0 +1,28 @@
+appId: com.reduxion.launcher
+productName: Reduxion Launcher
+copyright: Copyright © 2025 Reduxion Team
+
+directories:
+  output: launcher-dist
+  buildResources: assets
+
+win:
+  target:
+    - target: dir
+      arch:
+        - x64
+  icon: assets/icon.ico
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowElevation: true
+  allowToChangeInstallationDirectory: true
+  installerIcon: assets/icon.ico
+  uninstallerIcon: assets/icon.ico
+  installerHeaderIcon: assets/icon.ico
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Reduxion Launcher
+  displayLanguageSelector: false
+  language: 1049

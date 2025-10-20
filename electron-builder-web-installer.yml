@@ -1,0 +1,53 @@
+appId: com.reduxion.launcher.webinstaller
+productName: Reduxion Web Installer
+copyright: Copyright © 2025 Reduxion Team
+
+directories:
+  output: FINAL-INSTALLER
+  buildResources: assets
+
+# Файлы, которые войдут в установщик
+files:
+  - installer-majestic.html
+  - installer-majestic.css
+  - installer-main.js
+  - online-installer.js
+  - downloader.js
+  - assets/**
+  - package.json
+  - "!node_modules/**"
+  - "!launcher-dist/**"
+  - "!installer-dist/**"
+  - "!Ready-to-Upload/**"
+  - "!build/**"
+  - "!dist/**"
+  - "!*.bat"
+  - "!*.md"
+  - "!main.js"
+  - "!launcher*.html"
+  - "!modern-*.html"
+  - "!script.js"
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  # Название итогового установщика
+  artifactName: ${productName}-v${version}.${ext}
+  icon: assets/icon.png
+
+# Настройки NSIS установщика (оболочка для Electron-приложения)
+nsis:
+  oneClick: true
+  perMachine: false
+  allowElevation: false
+  createDesktopShortcut: false
+  createStartMenuShortcut: false
+  runAfterFinish: true
+  deleteAppDataOnUninstall: true
+  # Компактный установщик
+  differentialPackage: false
+
+# Опционально: публикация (если хочешь автообновления установщика)
+publish: null

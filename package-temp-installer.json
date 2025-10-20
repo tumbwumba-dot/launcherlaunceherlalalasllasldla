@@ -1,0 +1,8 @@
+{ 
+  "name": "reduxion-web-installer", 
+  "version": "1.0.0", 
+  "description": "Reduxion Launcher Web Installer", 
+  "main": "installer-main.js", 
+  "author": "Reduxion Team", 
+  "license": "MIT" 
+} 

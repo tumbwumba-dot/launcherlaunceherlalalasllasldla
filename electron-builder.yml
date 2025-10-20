@@ -1,0 +1,63 @@
+appId: com.reduxion.launcher
+productName: Reduxion Launcher
+copyright: Copyright © 2025 Reduxion Team
+
+directories:
+  output: Ready-to-Upload
+  buildResources: assets
+
+files:
+  - "**/*"
+  - "!**/*.md"
+  - "!dist/**"
+  - "!test-dist/**"
+  - "!installer-dist/**"
+  - "!temp-installer/**"
+  - "!SFX-Installer/**"
+  - "!Ready-to-Upload/**"
+  - "!*.bat"
+  - "!*.log"
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+    - target: nsis-web
+      arch:
+        - x64
+  artifactName: ${productName}-Setup-${version}.${ext}
+  # Полностью отключаем подписывание
+  sign: null
+  signingHashAlgorithms: []
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowElevation: true
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: always
+  createStartMenuShortcut: true
+  shortcutName: Reduxion Launcher
+  runAfterFinish: true
+  deleteAppDataOnUninstall: false
+  displayLanguageSelector: false
+  warningsAsErrors: false
+
+nsisWeb:
+  oneClick: false
+  perMachine: false
+  allowElevation: true
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: always
+  createStartMenuShortcut: true
+  runAfterFinish: true
+  deleteAppDataOnUninstall: false
+  # Имя итогового маленького веб-установщика (.exe)
+  artifactName: ${productName}-Web-Setup-${version}.${ext}
+
+# Базовый URL, откуда веб-установщик будет скачивать пакет приложения (.7z) и blockmap
+# ЗАМЕНИТЕ на свой домен/путь и загрузите туда файлы из папки вывода сборки.
+publish:
+  provider: generic
+  url: https://your-domain.example.com/reduxion/launcher/
