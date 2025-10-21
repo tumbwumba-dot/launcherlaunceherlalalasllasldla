@@ -3,27 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reduxion Launcher - Majestic Style</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="launcher-majestic.css">
-    <style display="none">
-        /* Design System */
+    <title>Reduxion Launcher</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap');
+
         :root {
-            --primary: #E91E63;
-            --primary-dark: #C2185B;
-            --secondary: #9C27B0;
-            --bg-primary: #0A0A0F;
-            --bg-secondary: #151520;
-            --bg-card: #252535;
+            --primary-bg: #0A0A0F;
+            --accent-color: #E91E63;
+            --accent-dark: #C2185B;
             --text-primary: #FFFFFF;
             --text-secondary: #B8B8D0;
+            --font-main: 'Montserrat', sans-serif;
             --gradient-primary: linear-gradient(135deg, #E91E63 0%, #9C27B0 100%);
-            --gradient-secondary: linear-gradient(135deg, #FF5722 0%, #E91E63 100%);
-            --shadow-glow: 0 0 20px rgba(233, 30, 99, 0.3);
-            --radius-md: 12px;
-            --radius-lg: 16px;
         }
 
         * {
@@ -33,172 +24,79 @@
         }
 
         body {
-            font-family: 'Montserrat', sans-serif;
-            background: var(--bg-primary);
+            font-family: var(--font-main);
+            background-color: var(--primary-bg);
             color: var(--text-primary);
-            overflow: hidden;
-        }
-
-        .launcher-container {
-            display: flex;
             height: 100vh;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 80px;
-            background: var(--bg-secondary);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 24px 0;
-        }
-
-        .sidebar-logo {
-            width: 48px;
-            height: 48px;
-            background: var(--gradient-primary);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: 900;
-            margin-bottom: 40px;
-            box-shadow: var(--shadow-glow);
-        }
-
-        .sidebar-nav {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .nav-button {
-            width: 48px;
-            height: 48px;
-            background: transparent;
-            border: none;
-            border-radius: 12px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-        }
-
-        .nav-button:hover,
-        .nav-button.active {
-            background: rgba(233, 30, 99, 0.1);
-            color: var(--primary);
-        }
-
-        .nav-button.active::before {
-            content: '';
-            position: absolute;
-            left: -12px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 4px;
-            height: 24px;
-            background: var(--gradient-primary);
-            border-radius: 2px;
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            background: 
+                radial-gradient(ellipse 800px 600px at 50% 50%, rgba(233, 30, 99, 0.15), transparent 70%),
+                var(--primary-bg);
         }
 
-        /* Header */
         .launcher-header {
-            padding: 24px 32px;
-            background: rgba(21, 21, 32, 0.8);
-            backdrop-filter: blur(20px);
+            padding: 40px;
+            text-align: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
         }
 
-        .header-title {
-            font-size: 24px;
-            font-weight: 800;
+        .logo {
+            font-size: 48px;
+            font-weight: 900;
+            font-style: italic;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 40px rgba(233, 30, 99, 0.3);
         }
 
-        .online-badge {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 20px;
-            background: var(--bg-card);
-            border-radius: var(--radius-md);
+        .subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
-        .pulse {
-            width: 8px;
-            height: 8px;
-            background: #4CAF50;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; transform: scale(1.2); }
-        }
-
-        /* Content Area */
-        .content-area {
+        .launcher-content {
             flex: 1;
-            padding: 32px;
             overflow-y: auto;
-        }
-
-        .section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 24px;
+            padding: 40px;
         }
 
         .section-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text-secondary);
+            font-size: 24px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            text-align: center;
         }
 
-        .badge {
-            padding: 6px 12px;
-            background: rgba(233, 30, 99, 0.1);
-            color: var(--primary);
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        /* Server Grid */
-        .servers-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-            gap: 24px;
-            margin-bottom: 32px;
+        .servers-container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
         .server-card {
-            background: var(--bg-card);
-            border-radius: var(--radius-lg);
-            padding: 24px;
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s;
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s ease;
             cursor: pointer;
             position: relative;
             overflow: hidden;
+            animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0;
         }
 
         .server-card::before {
@@ -210,13 +108,14 @@
             height: 3px;
             background: var(--gradient-primary);
             transform: scaleX(0);
-            transition: transform 0.3s;
+            transition: transform 0.3s ease;
         }
 
         .server-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--primary);
-            box-shadow: var(--shadow-glow);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(233, 30, 99, 0.3);
         }
 
         .server-card:hover::before {
@@ -224,29 +123,32 @@
         }
 
         .server-card.recommended {
-            border-color: var(--primary);
+            border-color: var(--accent-color);
+            background: rgba(233, 30, 99, 0.05);
         }
 
-        .server-badge {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            background: var(--gradient-primary);
-            padding: 4px 12px;
-            border-radius: 6px;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
+        .server-card:nth-child(1) { animation-delay: 0.1s; }
+        .server-card:nth-child(2) { animation-delay: 0.2s; }
+        .server-card:nth-child(3) { animation-delay: 0.3s; }
+        .server-card:nth-child(4) { animation-delay: 0.4s; }
+        .server-card:nth-child(5) { animation-delay: 0.5s; }
+        .server-card:nth-child(6) { animation-delay: 0.6s; }
 
         .server-header {
             display: flex;
             align-items: center;
-            gap: 16px;
+            justify-content: space-between;
             margin-bottom: 16px;
         }
 
+        .server-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
         .server-icon {
+            font-size: 32px;
             width: 56px;
             height: 56px;
             background: var(--gradient-primary);
@@ -254,44 +156,61 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
-            flex-shrink: 0;
+            box-shadow: 0 0 20px rgba(233, 30, 99, 0.4);
         }
 
-        .server-info {
-            flex: 1;
-        }
-
-        .server-name {
+        .server-details h3 {
             font-size: 20px;
             font-weight: 700;
             margin-bottom: 4px;
         }
 
-        .server-players {
+        .server-status {
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 14px;
+            font-size: 13px;
             color: var(--text-secondary);
         }
 
-        .status-online {
-            width: 6px;
-            height: 6px;
+        .status-dot {
+            width: 8px;
+            height: 8px;
             background: #4CAF50;
             border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+            }
+            50% {
+                opacity: 0.8;
+                box-shadow: 0 0 0 8px rgba(76, 175, 80, 0);
+            }
         }
 
         .player-count {
-            color: var(--primary);
+            color: var(--accent-color);
             font-weight: 700;
+        }
+
+        .recommended-badge {
+            background: var(--gradient-primary);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .server-description {
             color: var(--text-secondary);
             font-size: 14px;
-            line-height: 1.5;
+            line-height: 1.6;
             margin-bottom: 16px;
         }
 
@@ -299,16 +218,19 @@
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
 
         .tag {
-            padding: 4px 12px;
-            background: rgba(233, 30, 99, 0.1);
-            color: var(--primary);
+            padding: 6px 12px;
+            background: rgba(233, 30, 99, 0.15);
+            border: 1px solid rgba(233, 30, 99, 0.3);
+            color: var(--accent-color);
             border-radius: 6px;
             font-size: 11px;
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .server-actions {
@@ -318,14 +240,18 @@
 
         .btn-play {
             flex: 1;
-            padding: 12px;
+            padding: 14px 24px;
             background: var(--gradient-primary);
             border: none;
-            border-radius: var(--radius-md);
+            border-radius: 8px;
             color: white;
+            font-family: var(--font-main);
             font-weight: 700;
+            font-size: 14px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -334,57 +260,96 @@
 
         .btn-play:hover {
             transform: translateY(-2px);
-            box-shadow: var(--shadow-glow);
+            box-shadow: 0 5px 20px rgba(233, 30, 99, 0.5);
         }
 
-        .btn-settings {
-            width: 48px;
-            height: 48px;
-            background: var(--bg-secondary);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: var(--radius-md);
+        .btn-play:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            padding: 14px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
             color: var(--text-secondary);
+            font-family: var(--font-main);
+            font-weight: 600;
+            font-size: 14px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
         }
 
-        .btn-settings:hover {
-            border-color: var(--primary);
-            color: var(--primary);
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent-color);
+            color: var(--accent-color);
         }
 
-        /* Status Panel */
-        .status-panel {
-            background: var(--bg-card);
-            border-radius: var(--radius-lg);
+        .stats-panel {
+            max-width: 800px;
+            margin: 40px auto 0;
             padding: 24px;
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .status-grid {
+            border-radius: 12px;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 24px;
-        }
-
-        .status-item {
             text-align: center;
         }
 
-        .status-value {
-            font-size: 28px;
+        .stat-item {
+            padding: 12px;
+        }
+
+        .stat-value {
+            font-size: 32px;
             font-weight: 800;
             background: var(--gradient-primary);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
             margin-bottom: 8px;
         }
 
-        .status-label {
+        .stat-label {
             font-size: 12px;
             color: var(--text-secondary);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .footer {
+            padding: 20px 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .footer-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--accent-color);
+        }
+
+        .version {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 600;
         }
 
         /* Scrollbar */
@@ -400,17 +365,340 @@
             background: var(--gradient-primary);
             border-radius: 4px;
         }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #f06292 0%, #ba68c8 100%);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="launcher-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-logo">R</div>
-            
-            <nav class="sidebar-nav">
-                <button class="nav-button active" title="Серверы">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <header class="launcher-header">
+        <h1 class="logo">Reduxion Launcher</h1>
+        <p class="subtitle">Менеджер модификаций для Majestic RP</p>
+    </header>
+
+    <div class="launcher-content">
+        <h2 class="section-title">� ПОПУЛЯРНЫЕ РЕДУКСЫ</h2>
+
+        <div class="servers-container">
+            <div class="server-card recommended">
+                <div class="server-header">
+                    <div class="server-info">
+                        <div class="server-icon">�</div>
+                        <div class="server-details">
+                            <h3>Redux Graphics Enhanced</h3>
+                            <div class="server-status">
+                                <span class="status-dot"></span>
+                                <span>Версия: <span class="player-count">v4.2.1</span></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="recommended-badge">Рекомендуем</div>
+                </div>
+                <p class="server-description">
+                    Улучшенная графика и текстуры высокого разрешения. Оптимизация для слабых ПК.
+                </p>
+                <div class="server-tags">
+                    <span class="tag">Графика</span>
+                    <span class="tag">Популярный</span>
+                    <span class="tag">15.2K скачиваний</span>
+                </div>
+                <div class="server-actions">
+                    <button class="btn-play" onclick="installRedux('graphics-enhanced')">
+                        <span>⬇</span>
+                        <span>Установить</span>
+                    </button>
+                    <button class="btn-secondary" onclick="reduxSettings('graphics-enhanced')">⚙️</button>
+                </div>
+            </div>
+
+            <div class="server-card">
+                <div class="server-header">
+                    <div class="server-info">
+                        <div class="server-icon" style="background: linear-gradient(135deg, #FF5722 0%, #E91E63 100%);">�</div>
+                        <div class="server-details">
+                            <h3>Vehicle Pack Ultimate</h3>
+                            <div class="server-status">
+                                <span class="status-dot"></span>
+                                <span>Версия: <span class="player-count">v3.8.0</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="server-description">
+                    500+ новых автомобилей с реалистичной физикой и HD текстурами.
+                </p>
+                <div class="server-tags">
+                    <span class="tag">Транспорт</span>
+                    <span class="tag">HD</span>
+                    <span class="tag">12.8K скачиваний</span>
+                </div>
+                <div class="server-actions">
+                    <button class="btn-play" onclick="installRedux('vehicle-pack')">
+                        <span>⬇</span>
+                        <span>Установить</span>
+                    </button>
+                    <button class="btn-secondary" onclick="reduxSettings('vehicle-pack')">⚙️</button>
+                </div>
+            </div>
+
+            <div class="server-card">
+                <div class="server-header">
+                    <div class="server-info">
+                        <div class="server-icon" style="background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);">🎵</div>
+                        <div class="server-details">
+                            <h3>Custom Radio Stations</h3>
+                            <div class="server-status">
+                                <span class="status-dot"></span>
+                                <span>Версия: <span class="player-count">v2.5.3</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="server-description">
+                    50+ радиостанций с русской и зарубежной музыкой. Без рекламы.
+                </p>
+                <div class="server-tags">
+                    <span class="tag">Музыка</span>
+                    <span class="tag">Радио</span>
+                    <span class="tag">9.4K скачиваний</span>
+                </div>
+                <div class="server-actions">
+                    <button class="btn-play" onclick="installRedux('radio-stations')">
+                        <span>⬇</span>
+                        <span>Установить</span>
+                    </button>
+                    <button class="btn-secondary" onclick="reduxSettings('radio-stations')">⚙️</button>
+                </div>
+            </div>
+
+            <div class="server-card">
+                <div class="server-header">
+                    <div class="server-info">
+                        <div class="server-icon" style="background: linear-gradient(135deg, #FF9800 0%, #FF5722 100%);">💾</div>
+                        <div class="server-details">
+                            <h3>Performance Optimizer</h3>
+                            <div class="server-status">
+                                <span class="status-dot"></span>
+                                <span>Версия: <span class="player-count">v5.1.2</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="server-description">
+                    Увеличение FPS до 40%, оптимизация памяти и удаление лагов.
+                </p>
+                <div class="server-tags">
+                    <span class="tag">Оптимизация</span>
+                    <span class="tag">FPS</span>
+                    <span class="tag">18.6K скачиваний</span>
+                </div>
+                <div class="server-actions">
+                    <button class="btn-play" onclick="installRedux('performance')">
+                        <span>⬇</span>
+                        <span>Установить</span>
+                    </button>
+                    <button class="btn-secondary" onclick="reduxSettings('performance')">⚙️</button>
+                </div>
+            </div>
+
+            <div class="server-card">
+                <div class="server-header">
+                    <div class="server-info">
+                        <div class="server-icon" style="background: linear-gradient(135deg, #2196F3 0%, #03A9F4 100%);">�</div>
+                        <div class="server-details">
+                            <h3>Los Santos Remastered</h3>
+                            <div class="server-status">
+                                <span class="status-dot"></span>
+                                <span>Версия: <span class="player-count">v1.9.7</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="server-description">
+                    Полный ремастер карты Los Santos с новыми локациями и интерьерами.
+                </p>
+                <div class="server-tags">
+                    <span class="tag">Карта</span>
+                    <span class="tag">Интерьеры</span>
+                    <span class="tag">7.2K скачиваний</span>
+                </div>
+                <div class="server-actions">
+                    <button class="btn-play" onclick="installRedux('ls-remastered')">
+                        <span>⬇</span>
+                        <span>Установить</span>
+                    </button>
+                    <button class="btn-secondary" onclick="reduxSettings('ls-remastered')">⚙️</button>
+                </div>
+            </div>
+
+            <div class="server-card">
+                <div class="server-header">
+                    <div class="server-info">
+                        <div class="server-icon" style="background: linear-gradient(135deg, #9C27B0 0%, #673AB7 100%);">👔</div>
+                        <div class="server-details">
+                            <h3>Fashion Collection 2025</h3>
+                            <div class="server-status">
+                                <span class="status-dot"></span>
+                                <span>Версия: <span class="player-count">v6.0.1</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="server-description">
+                    1000+ новых предметов одежды, аксессуаров и причесок для персонажей.
+                </p>
+                <div class="server-tags">
+                    <span class="tag">Одежда</span>
+                    <span class="tag">Стиль</span>
+                    <span class="tag">11.3K скачиваний</span>
+                </div>
+                <div class="server-actions">
+                    <button class="btn-play" onclick="installRedux('fashion-2025')">
+                        <span>⬇</span>
+                        <span>Установить</span>
+                    </button>
+                    <button class="btn-secondary" onclick="reduxSettings('fashion-2025')">⚙️</button>
+                </div>
+            </div>
+
+            <div class="server-card">
+                <div class="server-header">
+                    <div class="server-info">
+                        <div class="server-icon" style="background: linear-gradient(135deg, #F44336 0%, #E91E63 100%);">🔫</div>
+                        <div class="server-details">
+                            <h3>Weapon Realism Pack</h3>
+                            <div class="server-status">
+                                <span class="status-dot"></span>
+                                <span>Версия: <span class="player-count">v2.7.4</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="server-description">
+                    Реалистичные звуки оружия, новая физика отдачи и 200+ видов оружия.
+                </p>
+                <div class="server-tags">
+                    <span class="tag">Оружие</span>
+                    <span class="tag">Реализм</span>
+                    <span class="tag">14.1K скачиваний</span>
+                </div>
+                <div class="server-actions">
+                    <button class="btn-play" onclick="installRedux('weapon-realism')">
+                        <span>⬇</span>
+                        <span>Установить</span>
+                    </button>
+                    <button class="btn-secondary" onclick="reduxSettings('weapon-realism')">⚙️</button>
+                </div>
+            </div>
+
+            <div class="server-card">
+                <div class="server-header">
+                    <div class="server-info">
+                        <div class="server-icon" style="background: linear-gradient(135deg, #CDDC39 0%, #4CAF50 100%);">🌤️</div>
+                        <div class="server-details">
+                            <h3>Weather & Seasons Mod</h3>
+                            <div class="server-status">
+                                <span class="status-dot"></span>
+                                <span>Версия: <span class="player-count">v1.4.8</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="server-description">
+                    Динамическая погода, времена года и реалистичное освещение.
+                </p>
+                <div class="server-tags">
+                    <span class="tag">Погода</span>
+                    <span class="tag">Графика</span>
+                    <span class="tag">6.9K скачиваний</span>
+                </div>
+                <div class="server-actions">
+                    <button class="btn-play" onclick="installRedux('weather-seasons')">
+                        <span>⬇</span>
+                        <span>Установить</span>
+                    </button>
+                    <button class="btn-secondary" onclick="reduxSettings('weather-seasons')">⚙️</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-panel">
+            <div class="stat-item">
+                <div class="stat-value">127</div>
+                <div class="stat-label">Всего редуксов</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">892K</div>
+                <div class="stat-label">Скачиваний</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">4.8★</div>
+                <div class="stat-label">Средний рейтинг</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        if (typeof require !== 'undefined') {
+            const { ipcRenderer } = require('electron');
+
+            function installRedux(reduxId) {
+                console.log('Установка редукса:', reduxId);
+                ipcRenderer.invoke('install-redux', { redux: reduxId });
+            }
+
+            function reduxSettings(reduxId) {
+                console.log('Настройки редукса:', reduxId);
+                ipcRenderer.invoke('open-redux-settings', { redux: reduxId });
+            }
+
+            function openSettings() {
+                ipcRenderer.invoke('open-settings');
+            }
+
+            function openHelp() {
+                ipcRenderer.invoke('open-help');
+            }
+
+            function openCommunity() {
+                ipcRenderer.invoke('open-community');
+            }
+        } else {
+            function installRedux(reduxId) {
+                alert('Установка редукса: ' + reduxId);
+            }
+
+            function reduxSettings(reduxId) {
+                alert('Настройки редукса: ' + reduxId);
+            }
+
+            function openSettings() {
+                alert('Открытие настроек');
+            }
+
+            function openHelp() {
+                alert('Открытие справки');
+            }
+
+            function openCommunity() {
+                alert('Открытие сообщества');
+            }
+        }
+    </script>
+</body>
+</html>
                         <rect x="2" y="3" width="20" height="6" rx="2"/>
                         <rect x="2" y="15" width="20" height="6" rx="2"/>
                         <circle cx="6" cy="6" r="1" fill="currentColor"/>

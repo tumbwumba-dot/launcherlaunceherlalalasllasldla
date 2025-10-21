@@ -13,6 +13,18 @@ files:
   - downloader.js
   - package.json
   - assets/**/*
+  - '!**/*.md'
+  - '!**/*.log'
+  - '!node_modules/**/*'
+  - '!dist/**/*'
+  - '!build/**/*'
+
+extraMetadata:
+  main: installer-main.js
+
+extraResources:
+  - from: launcher-dist
+    to: launcher-dist
 
 win:
   target:

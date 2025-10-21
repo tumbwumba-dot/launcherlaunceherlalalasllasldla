@@ -54,8 +54,8 @@ function createMainWindow() {
 
      // Создаем окно браузера
      mainWindow = new BrowserWindow({
-       width: isInstaller ? 1000 : 1400,
-       height: isInstaller ? 700 : 900,
+       width: isInstaller ? 1000 : 900,
+       height: isInstaller ? 700 : 700,
        minWidth: 800,
        minHeight: 600,
        webPreferences: {
