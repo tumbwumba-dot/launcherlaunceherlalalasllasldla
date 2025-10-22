@@ -805,6 +805,169 @@ ipcMain.handle('uninstall-redux', async (event, reduxId) => {
   }
 });
 
+// Обработка скачивания редукса
+const activeDownloads = new Map();
+
+ipcMain.on('download-redux', async (event, data) => {
+  const { downloadId, url, reduxId } = data;
+  
+  try {
+    console.log('Начинается загрузка:', url);
+    
+    const downloadsDir = path.join(app.getPath('userData'), 'downloads');
+    await fs.ensureDir(downloadsDir);
+    
+    const fileName = `${reduxId}.zip`;
+    const filePath = path.join(downloadsDir, fileName);
+    
+    // Создаем HTTP запрос
+    const file = fs.createWriteStream(filePath);
+    let downloadedBytes = 0;
+    let totalBytes = 0;
+    let startTime = Date.now();
+    
+    https.get(url, (response) => {
+      // Обработка редиректов
+      if (response.statusCode === 302 || response.statusCode === 301) {
+        https.get(response.headers.location, handleDownload);
+        return;
+      }
+      
+      handleDownload(response);
+    }).on('error', (err) => {
+      console.error('Ошибка загрузки:', err);
+      mainWindow.webContents.send('download-error', {
+        downloadId: downloadId,
+        error: err.message
+      });
+      fs.unlink(filePath, () => {});
+    });
+    
+    function handleDownload(response) {
+      if (response.statusCode !== 200) {
+        const error = `HTTP ${response.statusCode}`;
+        mainWindow.webContents.send('download-error', {
+          downloadId: downloadId,
+          error: error
+        });
+        fs.unlink(filePath, () => {});
+        return;
+      }
+      
+      totalBytes = parseInt(response.headers['content-length'], 10);
+      
+      response.on('data', (chunk) => {
+        downloadedBytes += chunk.length;
+        
+        // Вычисляем скорость
+        const elapsedTime = (Date.now() - startTime) / 1000;
+        const speed = (downloadedBytes / elapsedTime / 1024 / 1024).toFixed(1) + ' MB/s';
+        const progress = Math.round((downloadedBytes / totalBytes) * 100);
+        const downloaded = (downloadedBytes / 1024 / 1024).toFixed(1) + ' MB';
+        const total = (totalBytes / 1024 / 1024).toFixed(1) + ' MB';
+        
+        // Отправляем прогресс
+        mainWindow.webContents.send('download-progress', {
+          downloadId: downloadId,
+          progress: progress,
+          speed: speed,
+          downloaded: downloaded,
+          total: total
+        });
+      });
+      
+      response.pipe(file);
+      
+      file.on('finish', () => {
+        file.close(() => {
+          console.log('Загрузка завершена:', filePath);
+          mainWindow.webContents.send('download-complete', {
+            downloadId: downloadId,
+            filePath: filePath
+          });
+        });
+      });
+      
+      file.on('error', (err) => {
+        console.error('Ошибка записи файла:', err);
+        mainWindow.webContents.send('download-error', {
+          downloadId: downloadId,
+          error: err.message
+        });
+        fs.unlink(filePath, () => {});
+      });
+    }
+    
+    activeDownloads.set(downloadId, { url, filePath });
+    
+  } catch (error) {
+    console.error('Ошибка при загрузке:', error);
+    mainWindow.webContents.send('download-error', {
+      downloadId: downloadId,
+      error: error.message
+    });
+  }
+});
+
+// Отмена загрузки
+ipcMain.on('cancel-download', (event, data) => {
+  const { downloadId } = data;
+  const download = activeDownloads.get(downloadId);
+  
+  if (download && download.filePath) {
+    fs.unlink(download.filePath, () => {
+      console.log('Файл загрузки удалён:', download.filePath);
+    });
+  }
+  
+  activeDownloads.delete(downloadId);
+});
+
+// Установка скачанного редукса
+ipcMain.on('install-downloaded-redux', async (event, data) => {
+  const { downloadId, reduxId, filePath } = data;
+  
+  try {
+    console.log('Установка редукса:', reduxId, 'из', filePath);
+    
+    if (!appSettings.gtaPath || !fs.existsSync(appSettings.gtaPath)) {
+      mainWindow.webContents.send('download-error', {
+        downloadId: downloadId,
+        error: 'Путь к GTA 5 не указан'
+      });
+      return;
+    }
+    
+    // Распаковываем архив
+    const AdmZip = require('adm-zip');
+    const zip = new AdmZip(filePath);
+    
+    // Извлекаем прямо в папку GTA 5
+    console.log('Распаковка в:', appSettings.gtaPath);
+    zip.extractAllTo(appSettings.gtaPath, true);
+    
+    console.log('Установка завершена');
+    mainWindow.webContents.send('install-complete', {
+      downloadId: downloadId,
+      reduxId: reduxId
+    });
+    
+    // Удаляем архив после установки
+    setTimeout(() => {
+      fs.unlink(filePath, () => {
+        console.log('Архив удалён:', filePath);
+      });
+    }, 1000);
+    
+  } catch (error) {
+    console.error('Ошибка установки:', error);
+    mainWindow.webContents.send('download-error', {
+      downloadId: downloadId,
+      error: error.message
+    });
+  }
+});
+
 // Инициализация приложения
 app.whenReady().then(async () => {
    try {

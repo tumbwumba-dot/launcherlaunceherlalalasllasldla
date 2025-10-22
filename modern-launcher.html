@@ -615,6 +615,182 @@
         .settings-page {
             display: none;
         }
+
+        .downloads-page {
+            display: none;
+        }
+
+        .download-item {
+            background: #13141a;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .download-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .download-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .download-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #e91e63 0%, #c2185b 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .download-icon svg {
+            width: 24px;
+            height: 24px;
+            color: white;
+        }
+
+        .download-details {
+            flex: 1;
+        }
+
+        .download-name {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .download-status {
+            font-size: 13px;
+            color: #888899;
+        }
+
+        .download-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .download-action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #888899;
+        }
+
+        .download-action-btn:hover {
+            background: rgba(233, 30, 99, 0.12);
+            color: #e91e63;
+        }
+
+        .download-action-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .download-install-btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #e91e63 0%, #c2185b 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .download-install-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(233, 30, 99, 0.4);
+        }
+
+        .downloads-history-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #888899;
+            margin: 32px 0 16px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .download-progress {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .download-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #e91e63 0%, #c2185b 100%);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .download-progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        .download-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666677;
+        }
+
+        .download-speed {
+            color: #e91e63;
+            font-weight: 600;
+        }
+
+        .downloads-empty {
+            text-align: center;
+            padding: 80px 20px;
+            color: #666677;
+        }
+
+        .downloads-empty svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .downloads-empty-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #888899;
+        }
+
+        .downloads-empty-text {
+            font-size: 14px;
+        }
         .settings-page.active {
             display: block;
         }
@@ -748,6 +924,9 @@
         <div class="nav-icon active" data-page="home">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
         </div>
+        <div class="nav-icon" data-page="downloads">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+        </div>
         <div class="nav-icon" data-page="settings">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94L14.4 2.81c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
         </div>
@@ -868,6 +1047,25 @@
                             <button class="setting-button" onclick="checkUpdatesNow()">Проверить обновления</button>
                         </div>
                     </div>
+                </div>
+            </section>
+
+            <section class="reduxes-panel downloads-page" id="downloads-page">
+                <div class="settings-title">Загрузки</div>
+
+                <div id="downloads-list">
+                    <!-- Загрузки будут здесь -->
+                </div>
+
+                <div class="downloads-history-title" id="history-title" style="display: none;">История загрузок</div>
+                <div id="downloads-history">
+                    <!-- История загрузок -->
+                </div>
+
+                <div class="downloads-empty" id="downloads-empty">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                    <div class="downloads-empty-title">Нет активных загрузок</div>
+                    <div class="downloads-empty-text">Скачанные редуксы появятся здесь</div>
                 </div>
             </section>
 
@@ -1090,10 +1288,18 @@
                 ipcRenderer.send('uninstall-redux', reduxId);
                 showToast('warn', `${redux.name} удалён`);
             } else {
-                redux.installed = true;
-                loadReduxes();
-                ipcRenderer.send('install-redux', reduxId);
-                showToast('success', `${redux.name} установлен`);
+                // Показываем страницу загрузок
+                document.querySelector('[data-page="downloads"]').click();
+                
+                // Получаем URL для загрузки
+                const downloadUrl = reduxDownloadUrls[reduxId];
+                if (!downloadUrl) {
+                    showToast('error', 'Не найден URL для загрузки');
+                    return;
+                }
+                
+                // Добавляем реальную загрузку
+                addDownload(reduxId, redux.name, downloadUrl);
             }
         }
 
@@ -1105,8 +1311,9 @@
                 icon.classList.add('active');
                 
                 // Переключение страниц
-                document.getElementById('home-page').classList.toggle('settings-page', page !== 'home');
-                document.getElementById('settings-page').classList.toggle('active', page === 'settings');
+                document.getElementById('home-page').style.display = page === 'home' ? 'block' : 'none';
+                document.getElementById('settings-page').style.display = page === 'settings' ? 'block' : 'none';
+                document.getElementById('downloads-page').style.display = page === 'downloads' ? 'block' : 'none';
             });
         });
 
@@ -1216,6 +1423,280 @@
             });
             ipcRenderer.send('ui-confirm-result', { id: payload.id, confirmed: idx === 0 });
         });
+
+        // Система загрузок
+        const activeDownloads = new Map();
+        const downloadHistory = [];
+
+        // URL редуксов на GitHub
+        const reduxDownloadUrls = {
+            'panamera-redux': 'https://github.com/tumbwumba-dot/launcherlaunceherlalalasllasldla/releases/download/panamera/panamera.zip',
+            'gucci-redux-v2': 'https://github.com/tumbwumba-dot/launcherlaunceherlalalasllasldla/releases/download/v1.0.5/gucci-redux-v2.zip' // пример
+        };
+
+        function addDownload(reduxId, reduxName, downloadUrl) {
+            const downloadId = `dl-${Date.now()}`;
+            const download = {
+                id: downloadId,
+                reduxId: reduxId,
+                name: reduxName,
+                progress: 0,
+                speed: '0 MB/s',
+                downloaded: '0 MB',
+                total: '0 MB',
+                status: 'Подготовка...',
+                state: 'downloading', // downloading, completed, ready-to-install, installing, installed
+                downloadUrl: downloadUrl,
+                filePath: null
+            };
+            
+            activeDownloads.set(downloadId, download);
+            renderDownloads();
+            
+            // Начинаем реальную загрузку
+            startRealDownload(downloadId, downloadUrl);
+            
+            return downloadId;
+        }
+
+        function startRealDownload(downloadId, downloadUrl) {
+            const download = activeDownloads.get(downloadId);
+            if (!download) return;
+
+            download.status = 'Загрузка...';
+            
+            // Отправляем запрос на скачивание через IPC
+            ipcRenderer.send('download-redux', {
+                downloadId: downloadId,
+                url: downloadUrl,
+                reduxId: download.reduxId
+            });
+        }
+
+        // Обновление прогресса загрузки
+        ipcRenderer.on('download-progress', (event, data) => {
+            const download = activeDownloads.get(data.downloadId);
+            if (!download) return;
+            
+            download.progress = data.progress;
+            download.speed = data.speed;
+            download.downloaded = data.downloaded;
+            download.total = data.total;
+            download.status = 'Загрузка...';
+            
+            renderDownloads();
+        });
+
+        // Завершение загрузки
+        ipcRenderer.on('download-complete', (event, data) => {
+            const download = activeDownloads.get(data.downloadId);
+            if (!download) return;
+            
+            download.progress = 100;
+            download.status = 'Готов к установке';
+            download.state = 'ready-to-install';
+            download.filePath = data.filePath;
+            download.speed = '';
+            
+            renderDownloads();
+            showToast('success', `${download.name} скачан`);
+        });
+
+        // Ошибка загрузки
+        ipcRenderer.on('download-error', (event, data) => {
+            const download = activeDownloads.get(data.downloadId);
+            if (!download) return;
+            
+            download.status = 'Ошибка: ' + data.error;
+            download.state = 'error';
+            
+            renderDownloads();
+            showToast('error', `Ошибка загрузки ${download.name}`);
+        });
+
+        function updateDownloadProgress(downloadId, progress, speed, downloaded, total) {
+            const download = activeDownloads.get(downloadId);
+            if (!download) return;
+            
+            download.progress = progress;
+            download.speed = speed;
+            download.downloaded = downloaded;
+            download.total = total;
+            download.status = `Загрузка...`;
+            
+            renderDownloads();
+        }
+
+        function installDownloadedRedux(downloadId) {
+            const download = activeDownloads.get(downloadId);
+            if (!download || download.state !== 'ready-to-install') return;
+            
+            download.state = 'installing';
+            download.status = 'Установка...';
+            renderDownloads();
+            
+            // Отправляем запрос на установку
+            ipcRenderer.send('install-downloaded-redux', {
+                downloadId: downloadId,
+                reduxId: download.reduxId,
+                filePath: download.filePath
+            });
+        }
+
+        // Завершение установки
+        ipcRenderer.on('install-complete', (event, data) => {
+            const download = activeDownloads.get(data.downloadId);
+            if (!download) return;
+            
+            download.state = 'installed';
+            download.status = 'Установлен';
+            
+            // Помечаем редукс как установленный
+            const redux = reduxesDatabase.find(r => r.id === download.reduxId);
+            if (redux) {
+                redux.installed = true;
+                loadReduxes();
+            }
+            
+            renderDownloads();
+            showToast('success', `${download.name} установлен`);
+            
+            // Перемещаем в историю через 3 секунды
+            setTimeout(() => {
+                activeDownloads.delete(downloadId);
+                downloadHistory.unshift(download);
+                if (downloadHistory.length > 10) downloadHistory.pop(); // храним только 10 последних
+                renderDownloads();
+            }, 3000);
+        });
+
+        function cancelDownload(downloadId) {
+            const download = activeDownloads.get(downloadId);
+            if (!download) return;
+            
+            // Отменяем загрузку на бэкенде
+            ipcRenderer.send('cancel-download', { downloadId: downloadId });
+            
+            activeDownloads.delete(downloadId);
+            renderDownloads();
+            showToast('warn', 'Загрузка отменена');
+        }
+
+        function renderDownloads() {
+            const downloadsList = document.getElementById('downloads-list');
+            const downloadsHistory = document.getElementById('downloads-history');
+            const emptyState = document.getElementById('downloads-empty');
+            const historyTitle = document.getElementById('history-title');
+            
+            const hasActive = activeDownloads.size > 0;
+            const hasHistory = downloadHistory.length > 0;
+            
+            if (!hasActive && !hasHistory) {
+                downloadsList.style.display = 'none';
+                downloadsHistory.style.display = 'none';
+                historyTitle.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            
+            // Активные загрузки
+            if (hasActive) {
+                downloadsList.style.display = 'block';
+                downloadsList.innerHTML = '';
+                activeDownloads.forEach(download => {
+                    downloadsList.appendChild(createDownloadItem(download));
+                });
+            } else {
+                downloadsList.style.display = 'none';
+            }
+            
+            // История
+            if (hasHistory) {
+                historyTitle.style.display = 'block';
+                downloadsHistory.style.display = 'block';
+                downloadsHistory.innerHTML = '';
+                downloadHistory.forEach(download => {
+                    downloadsHistory.appendChild(createDownloadItem(download));
+                });
+            } else {
+                historyTitle.style.display = 'none';
+                downloadsHistory.style.display = 'none';
+            }
+        }
+
+        function createDownloadItem(download) {
+            const item = document.createElement('div');
+            item.className = 'download-item';
+            
+            const isReadyToInstall = download.state === 'ready-to-install';
+            const isInstalling = download.state === 'installing';
+            const isInstalled = download.state === 'installed';
+            const isDownloading = download.state === 'downloading';
+            const isError = download.state === 'error';
+            
+            item.innerHTML = `
+                <div class="download-header">
+                    <div class="download-info">
+                        <div class="download-icon">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                            </svg>
+                        </div>
+                        <div class="download-details">
+                            <div class="download-name">${download.name}</div>
+                            <div class="download-status">${download.status}</div>
+                        </div>
+                    </div>
+                    <div class="download-actions">
+                        ${isReadyToInstall ? `
+                            <button class="download-install-btn" onclick="installDownloadedRedux('${download.id}')">
+                                Установить
+                            </button>
+                        ` : ''}
+                        ${isDownloading ? `
+                            <button class="download-action-btn" onclick="cancelDownload('${download.id}')">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                                </svg>
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+                ${!isInstalled ? `
+                    <div class="download-progress">
+                        <div class="download-progress-bar" style="width: ${download.progress}%"></div>
+                    </div>
+                    <div class="download-stats">
+                        <span>${download.downloaded} / ${download.total}</span>
+                        <span class="download-speed">${download.speed}</span>
+                    </div>
+                ` : ''}
+            `;
+            
+            return item;
+        }
+
+        // Тестовая загрузка (для демо)
+        function testDownload() {
+            const downloadId = addDownload('test', 'GUCCI REDUX v2');
+            let progress = 0;
+            
+            const interval = setInterval(() => {
+                progress += Math.random() * 10;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    completeDownload(downloadId);
+                } else {
+                    const speed = (Math.random() * 10 + 5).toFixed(1) + ' MB/s';
+                    const downloaded = (progress * 2.5).toFixed(1) + ' MB';
+                    const total = '250 MB';
+                    updateDownloadProgress(downloadId, progress, speed, downloaded, total);
+                }
+            }, 500);
+        }
 
         // Загружаем данные при старте
         document.addEventListener('DOMContentLoaded', () => {
