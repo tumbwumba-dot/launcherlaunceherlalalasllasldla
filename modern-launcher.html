@@ -934,7 +934,7 @@
 
     <div class="main-container">
         <header class="top-bar">
-            <div class="version-badge">v1.0.5 (alpha)</div>
+            <div class="version-badge">v1.0.6 (alpha)</div>
             <div class="window-controls">
                 <button class="window-btn" onclick="minimizeWindow()">−</button>
                 <button class="window-btn" onclick="closeWindow()">×</button>
@@ -1042,7 +1042,7 @@
                         <div class="setting-item">
                             <div class="setting-left">
                                 <div class="setting-label">Версия лаунчера</div>
-                                <div class="setting-value">v1.0.5 (alpha)</div>
+                                <div class="setting-value">v1.0.6 (alpha)</div>
                             </div>
                             <button class="setting-button" onclick="checkUpdatesNow()">Проверить обновления</button>
                         </div>
@@ -1284,6 +1284,7 @@
             
             if (redux.installed) {
                 redux.installed = false;
+                saveInstalledReduxes(); // Сохраняем состояние
                 loadReduxes();
                 ipcRenderer.send('uninstall-redux', reduxId);
                 showToast('warn', `${redux.name} удалён`);
@@ -1298,9 +1299,31 @@
                     return;
                 }
                 
+                // Проверяем, есть ли уже загрузка этого редукса
+                const existingDownload = Array.from(activeDownloads.values())
+                    .find(d => d.reduxId === reduxId && (d.state === 'downloading' || d.state === 'ready-to-install'));
+                
+                if (existingDownload) {
+                    showToast('warn', 'Загрузка уже активна');
+                    return;
+                }
+                
                 // Добавляем реальную загрузку
                 addDownload(reduxId, redux.name, downloadUrl);
             }
+        }
+        
+        // Функция для возобновления загрузки
+        function resumeDownload(downloadId) {
+            const download = activeDownloads.get(downloadId);
+            if (!download || download.state !== 'downloading') return;
+            
+            download.status = 'Возобновление...';
+            saveActiveDownloads();
+            renderDownloads();
+            
+            // Возобновляем загрузку
+            startRealDownload(downloadId, download.downloadUrl);
         }
 
         // Обработчики навигации
@@ -1427,6 +1450,71 @@
         // Система загрузок
         const activeDownloads = new Map();
         const downloadHistory = [];
+        
+        // Функции для работы с localStorage
+        function saveToStorage(key, data) {
+            try {
+                localStorage.setItem(key, JSON.stringify(data));
+            } catch (e) {
+                console.error('Ошибка сохранения в localStorage:', e);
+            }
+        }
+        
+        function loadFromStorage(key, defaultValue = null) {
+            try {
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : defaultValue;
+            } catch (e) {
+                console.error('Ошибка загрузки из localStorage:', e);
+                return defaultValue;
+            }
+        }
+        
+        // Загрузка сохраненных данных при старте
+        function loadPersistedData() {
+            // Загружаем активные загрузки
+            const savedDownloads = loadFromStorage('activeDownloads', []);
+            savedDownloads.forEach(download => {
+                // Проверяем, не завершена ли загрузка
+                if (download.state === 'downloading' || download.state === 'ready-to-install') {
+                    activeDownloads.set(download.id, download);
+                }
+            });
+            
+            // Загружаем историю
+            const savedHistory = loadFromStorage('downloadHistory', []);
+            downloadHistory.push(...savedHistory);
+            
+            // Загружаем состояние установленных редуксов
+            const savedInstalled = loadFromStorage('installedReduxes', {});
+            reduxesDatabase.forEach(redux => {
+                if (savedInstalled[redux.id]) {
+                    redux.installed = true;
+                }
+            });
+            
+            renderDownloads();
+        }
+        
+        // Сохранение данных при изменениях
+        function saveActiveDownloads() {
+            const downloadsArray = Array.from(activeDownloads.values());
+            saveToStorage('activeDownloads', downloadsArray);
+        }
+        
+        function saveDownloadHistory() {
+            saveToStorage('downloadHistory', downloadHistory);
+        }
+        
+        function saveInstalledReduxes() {
+            const installed = {};
+            reduxesDatabase.forEach(redux => {
+                if (redux.installed) {
+                    installed[redux.id] = true;
+                }
+            });
+            saveToStorage('installedReduxes', installed);
+        }
 
         // URL редуксов на GitHub
         const reduxDownloadUrls = {
@@ -1445,12 +1533,15 @@
                 downloaded: '0 MB',
                 total: '0 MB',
                 status: 'Подготовка...',
-                state: 'downloading', // downloading, completed, ready-to-install, installing, installed
+                state: 'downloading', // downloading, completed, ready-to-install, installing, installed, cancelled
                 downloadUrl: downloadUrl,
-                filePath: null
+                filePath: null,
+                startTime: Date.now(),
+                resumeData: null // для возобновления загрузки
             };
             
             activeDownloads.set(downloadId, download);
+            saveActiveDownloads(); // Сохраняем состояние
             renderDownloads();
             
             // Начинаем реальную загрузку
@@ -1465,11 +1556,13 @@
 
             download.status = 'Загрузка...';
             
-            // Отправляем запрос на скачивание через IPC
+            // Отправляем запрос на скачивание через IPC с данными для возобновления
             ipcRenderer.send('download-redux', {
                 downloadId: downloadId,
                 url: downloadUrl,
-                reduxId: download.reduxId
+                reduxId: download.reduxId,
+                resumeData: download.resumeData, // данные для возобновления
+                resumeFrom: download.progress > 0 ? download.progress : 0
             });
         }
 
@@ -1483,7 +1576,9 @@
             download.downloaded = data.downloaded;
             download.total = data.total;
             download.status = 'Загрузка...';
+            download.resumeData = data.resumeData; // сохраняем данные для возобновления
             
+            saveActiveDownloads(); // Сохраняем состояние
             renderDownloads();
         });
 
@@ -1498,7 +1593,9 @@
             download.state = 'ready-to-install';
             download.filePath = data.filePath;
             download.speed = '';
+            download.resumeData = null; // очищаем данные возобновления
             
+            saveActiveDownloads(); // Сохраняем состояние
             renderDownloads();
             showToast('success', `${download.name} скачан`);
         });
@@ -1511,6 +1608,7 @@
             download.status = 'Ошибка: ' + data.error;
             download.state = 'error';
             
+            saveActiveDownloads(); // Сохраняем состояние
             renderDownloads();
             showToast('error', `Ошибка загрузки ${download.name}`);
         });
@@ -1525,6 +1623,7 @@
             download.total = total;
             download.status = `Загрузка...`;
             
+            saveActiveDownloads(); // Сохраняем состояние
             renderDownloads();
         }
 
@@ -1534,6 +1633,8 @@
             
             download.state = 'installing';
             download.status = 'Установка...';
+            
+            saveActiveDownloads(); // Сохраняем состояние
             renderDownloads();
             
             // Отправляем запрос на установку
@@ -1557,17 +1658,21 @@
             const redux = reduxesDatabase.find(r => r.id === download.reduxId);
             if (redux) {
                 redux.installed = true;
+                saveInstalledReduxes(); // Сохраняем состояние установленных редуксов
                 loadReduxes();
             }
             
+            saveActiveDownloads(); // Сохраняем состояние
             renderDownloads();
             showToast('success', `${download.name} установлен`);
             
             // Перемещаем в историю через 3 секунды
             setTimeout(() => {
-                activeDownloads.delete(downloadId);
+                activeDownloads.delete(data.downloadId);
                 downloadHistory.unshift(download);
                 if (downloadHistory.length > 10) downloadHistory.pop(); // храним только 10 последних
+                saveActiveDownloads(); // Сохраняем состояние
+                saveDownloadHistory(); // Сохраняем историю
                 renderDownloads();
             }, 3000);
         });
@@ -1583,8 +1688,9 @@
             // Отменяем загрузку на бэкенде
             ipcRenderer.send('cancel-download', { downloadId: downloadId });
             
-            // Удаляем из активных сразу
+            // Удаляем из активных и сохраняем состояние
             activeDownloads.delete(downloadId);
+            saveActiveDownloads();
             renderDownloads();
             showToast('warn', 'Загрузка отменена');
         }
@@ -1642,6 +1748,7 @@
             const isInstalled = download.state === 'installed';
             const isDownloading = download.state === 'downloading';
             const isError = download.state === 'error';
+            const isCancelled = download.state === 'cancelled';
             
             item.innerHTML = `
                 <div class="download-header">
@@ -1663,10 +1770,15 @@
                             </button>
                         ` : ''}
                         ${isDownloading ? `
-                            <button class="download-action-btn" onclick="cancelDownload('${download.id}')">
+                            <button class="download-action-btn" onclick="cancelDownload('${download.id}')" title="Отменить загрузку">
                                 <svg viewBox="0 0 24 24" fill="currentColor">
                                     <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
                                 </svg>
+                            </button>
+                        ` : ''}
+                        ${isError || isCancelled ? `
+                            <button class="download-install-btn" onclick="resumeDownload('${download.id}')" style="background: rgba(33, 208, 122, 0.8);">
+                                Возобновить
                             </button>
                         ` : ''}
                     </div>
@@ -1707,6 +1819,7 @@
 
         // Загружаем данные при старте
         document.addEventListener('DOMContentLoaded', () => {
+            loadPersistedData(); // Загружаем сохраненные данные
             loadReduxes();
             loadSettingsUI();
             // Привязки контролов настроек

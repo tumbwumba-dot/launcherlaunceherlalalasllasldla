@@ -12,7 +12,7 @@ let mainWindow;
 let downloadManager;
 
 // Текущая версия лаунчера
-const CURRENT_VERSION = '1.0.5';
+const CURRENT_VERSION = '1.0.6';
 
 // Путь к настройкам приложения
 const settingsPath = path.join(app.getPath('userData'), 'settings.json');
