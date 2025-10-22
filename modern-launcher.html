@@ -1430,7 +1430,7 @@
 
         // URL редуксов на GitHub
         const reduxDownloadUrls = {
-            'panamera-redux': 'https://github.com/tumbwumba-dot/launcherlaunceherlalalasllasldla/releases/download/panamera/panamera.zip',
+            'panamera-redux': 'https://github.com/tumbwumba-dot/launcherlaunceherlalalasllasldla/releases/download/panamera/panamera.redux.rar',
             'gucci-redux-v2': 'https://github.com/tumbwumba-dot/launcherlaunceherlalalasllasldla/releases/download/v1.0.5/gucci-redux-v2.zip' // пример
         };
 
@@ -1490,7 +1490,8 @@
         // Завершение загрузки
         ipcRenderer.on('download-complete', (event, data) => {
             const download = activeDownloads.get(data.downloadId);
-            if (!download) return;
+            // Проверяем что загрузка ещё активна (не отменена)
+            if (!download || download.state === 'cancelled') return;
             
             download.progress = 100;
             download.status = 'Готов к установке';
@@ -1546,7 +1547,8 @@
         // Завершение установки
         ipcRenderer.on('install-complete', (event, data) => {
             const download = activeDownloads.get(data.downloadId);
-            if (!download) return;
+            // Проверяем что загрузка ещё активна
+            if (!download || download.state === 'cancelled') return;
             
             download.state = 'installed';
             download.status = 'Установлен';
@@ -1574,9 +1576,14 @@
             const download = activeDownloads.get(downloadId);
             if (!download) return;
             
+            // Помечаем как отменённую
+            download.state = 'cancelled';
+            download.status = 'Отменено';
+            
             // Отменяем загрузку на бэкенде
             ipcRenderer.send('cancel-download', { downloadId: downloadId });
             
+            // Удаляем из активных сразу
             activeDownloads.delete(downloadId);
             renderDownloads();
             showToast('warn', 'Загрузка отменена');

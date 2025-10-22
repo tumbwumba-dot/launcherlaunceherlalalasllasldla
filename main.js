@@ -817,7 +817,9 @@ ipcMain.on('download-redux', async (event, data) => {
     const downloadsDir = path.join(app.getPath('userData'), 'downloads');
     await fs.ensureDir(downloadsDir);
     
-    const fileName = `${reduxId}.zip`;
+    // Определяем расширение из URL
+    const fileExt = url.endsWith('.rar') ? '.rar' : '.zip';
+    const fileName = `${reduxId}${fileExt}`;
     const filePath = path.join(downloadsDir, fileName);
     
     // Создаем HTTP запрос
@@ -825,38 +827,54 @@ ipcMain.on('download-redux', async (event, data) => {
     let downloadedBytes = 0;
     let totalBytes = 0;
     let startTime = Date.now();
+    let request = null;
+    let isCancelled = false;
     
-    https.get(url, (response) => {
-      // Обработка редиректов
-      if (response.statusCode === 302 || response.statusCode === 301) {
-        https.get(response.headers.location, handleDownload);
+    const startDownload = (downloadUrl) => {
+      request = https.get(downloadUrl, (response) => {
+        // Обработка редиректов
+        if (response.statusCode === 302 || response.statusCode === 301) {
+          request.abort();
+          startDownload(response.headers.location);
+          return;
+        }
+        
+        handleDownload(response);
+      }).on('error', (err) => {
+        if (isCancelled) return;
+        console.error('Ошибка загрузки:', err);
+        mainWindow.webContents.send('download-error', {
+          downloadId: downloadId,
+          error: err.message
+        });
+        cleanupFile();
+      });
+    };
+    
+    function handleDownload(response) {
+      if (isCancelled) {
+        response.destroy();
         return;
       }
       
-      handleDownload(response);
-    }).on('error', (err) => {
-      console.error('Ошибка загрузки:', err);
-      mainWindow.webContents.send('download-error', {
-        downloadId: downloadId,
-        error: err.message
-      });
-      fs.unlink(filePath, () => {});
-    });
-    
-    function handleDownload(response) {
       if (response.statusCode !== 200) {
         const error = `HTTP ${response.statusCode}`;
         mainWindow.webContents.send('download-error', {
           downloadId: downloadId,
           error: error
         });
-        fs.unlink(filePath, () => {});
+        cleanupFile();
         return;
       }
       
       totalBytes = parseInt(response.headers['content-length'], 10);
       
       response.on('data', (chunk) => {
+        if (isCancelled) {
+          response.destroy();
+          return;
+        }
+        
         downloadedBytes += chunk.length;
         
         // Вычисляем скорость
@@ -879,6 +897,11 @@ ipcMain.on('download-redux', async (event, data) => {
       response.pipe(file);
       
       file.on('finish', () => {
+        if (isCancelled) {
+          cleanupFile();
+          return;
+        }
+        
         file.close(() => {
           console.log('Загрузка завершена:', filePath);
           mainWindow.webContents.send('download-complete', {
@@ -889,16 +912,40 @@ ipcMain.on('download-redux', async (event, data) => {
       });
       
       file.on('error', (err) => {
+        if (isCancelled) return;
         console.error('Ошибка записи файла:', err);
         mainWindow.webContents.send('download-error', {
           downloadId: downloadId,
           error: err.message
         });
-        fs.unlink(filePath, () => {});
+        cleanupFile();
       });
     }
     
-    activeDownloads.set(downloadId, { url, filePath });
+    function cleanupFile() {
+      try {
+        file.close(() => {
+          fs.unlink(filePath, (err) => {
+            if (err) console.error('Ошибка удаления файла:', err);
+          });
+        });
+      } catch (e) {
+        console.error('Ошибка очистки:', e);
+      }
+    }
+    
+    activeDownloads.set(downloadId, { 
+      url, 
+      filePath, 
+      request,
+      cancel: () => {
+        isCancelled = true;
+        if (request) request.abort();
+        cleanupFile();
+      }
+    });
+    
+    startDownload(url);
     
   } catch (error) {
     console.error('Ошибка при загрузке:', error);
@@ -914,13 +961,16 @@ ipcMain.on('cancel-download', (event, data) => {
   const { downloadId } = data;
   const download = activeDownloads.get(downloadId);
   
-  if (download && download.filePath) {
-    fs.unlink(download.filePath, () => {
-      console.log('Файл загрузки удалён:', download.filePath);
-    });
+  if (download) {
+    console.log('Отмена загрузки:', downloadId);
+    
+    // Вызываем функцию отмены
+    if (download.cancel) {
+      download.cancel();
+    }
+    
+    activeDownloads.delete(downloadId);
   }
-  
-  activeDownloads.delete(downloadId);
 });
 
 // Установка скачанного редукса
@@ -938,13 +988,56 @@ ipcMain.on('install-downloaded-redux', async (event, data) => {
       return;
     }
     
-    // Распаковываем архив
-    const AdmZip = require('adm-zip');
-    const zip = new AdmZip(filePath);
+    // Проверяем расширение файла
+    const isRar = filePath.endsWith('.rar');
+    const isZip = filePath.endsWith('.zip');
     
-    // Извлекаем прямо в папку GTA 5
-    console.log('Распаковка в:', appSettings.gtaPath);
-    zip.extractAllTo(appSettings.gtaPath, true);
+    if (!isRar && !isZip) {
+      mainWindow.webContents.send('download-error', {
+        downloadId: downloadId,
+        error: 'Неподдерживаемый формат архива'
+      });
+      return;
+    }
+    
+    console.log('Распаковка архива:', isRar ? 'RAR' : 'ZIP');
+    
+    if (isRar) {
+      // Распаковка RAR через node-unrar-js
+      const unrar = require('node-unrar-js');
+      const archiveData = fs.readFileSync(filePath);
+      const extractor = unrar.createExtractorFromData({ data: archiveData });
+      const list = extractor.getFileList();
+      const fileHeaders = [...list.fileHeaders];
+      
+      console.log(`Найдено файлов в архиве: ${fileHeaders.length}`);
+      
+      for (const fileHeader of fileHeaders) {
+        if (fileHeader.flags.directory) continue;
+        
+        const extracted = extractor.extract({ files: [fileHeader.name] });
+        const files = [...extracted.files];
+        
+        if (files.length > 0) {
+          const file = files[0];
+          const targetPath = path.join(appSettings.gtaPath, fileHeader.name);
+          
+          // Создаём директории если нужно
+          await fs.ensureDir(path.dirname(targetPath));
+          
+          // Записываем файл
+          await fs.writeFile(targetPath, file.extract[1]);
+          console.log('Извлечён:', fileHeader.name);
+        }
+      }
+    } else {
+      // Распаковка ZIP через adm-zip
+      const AdmZip = require('adm-zip');
+      const zip = new AdmZip(filePath);
+      
+      console.log('Распаковка в:', appSettings.gtaPath);
+      zip.extractAllTo(appSettings.gtaPath, true);
+    }
     
     console.log('Установка завершена');
     mainWindow.webContents.send('install-complete', {
@@ -952,12 +1045,16 @@ ipcMain.on('install-downloaded-redux', async (event, data) => {
       reduxId: reduxId
     });
     
-    // Удаляем архив после установки
+    // Удаляем архив после установки с задержкой для освобождения файла
     setTimeout(() => {
-      fs.unlink(filePath, () => {
-        console.log('Архив удалён:', filePath);
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error('Ошибка удаления архива:', err);
+        } else {
+          console.log('Архив удалён:', filePath);
+        }
       });
-    }, 1000);
+    }, 2000);
     
   } catch (error) {
     console.error('Ошибка установки:', error);
