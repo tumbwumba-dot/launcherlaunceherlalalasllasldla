@@ -1536,32 +1536,59 @@
 
         // Загрузка редуксов
         function loadReduxes() {
-            document.getElementById('redux-count').textContent = reduxesDatabase.length;
+            console.log('loadReduxes called, database length:', reduxesDatabase.length);
+            
+            const reduxCountElement = document.getElementById('redux-count');
+            if (reduxCountElement) {
+                reduxCountElement.textContent = reduxesDatabase.length;
+                console.log('Updated redux count to:', reduxesDatabase.length);
+            } else {
+                console.error('redux-count element not found!');
+            }
             
             const featured = reduxesDatabase.filter(r => r.featured);
+            console.log('Featured reduxes:', featured.length);
+            
             const featuredList = document.getElementById('featured-list');
-            featuredList.innerHTML = '';
-            featured.forEach(redux => {
-                featuredList.appendChild(createReduxItem(redux));
-            });
+            if (featuredList) {
+                featuredList.innerHTML = '';
+                featured.forEach(redux => {
+                    console.log('Adding featured redux:', redux.name);
+                    featuredList.appendChild(createReduxItem(redux));
+                });
+            } else {
+                console.error('featured-list element not found!');
+            }
             
             // Recent
             const recentHeader = document.getElementById('recent-header');
             const recentList = document.getElementById('recent-list');
             const recent = reduxesDatabase.filter(r => r.lastUsed);
-            recentList.innerHTML = '';
-            if (recent.length) {
-                recentHeader.style.display = '';
-                recent.forEach(r => recentList.appendChild(createReduxItem(r)));
+            if (recentList) {
+                recentList.innerHTML = '';
+                if (recent.length) {
+                    if (recentHeader) recentHeader.style.display = '';
+                    recent.forEach(r => recentList.appendChild(createReduxItem(r)));
+                } else {
+                    if (recentHeader) recentHeader.style.display = 'none';
+                }
             } else {
-                recentHeader.style.display = 'none';
+                console.error('recent-list element not found!');
             }
             
             const allList = document.getElementById('all-list');
-            allList.innerHTML = '';
-            reduxesDatabase.forEach(redux => {
-                allList.appendChild(createReduxItem(redux));
-            });
+            if (allList) {
+                allList.innerHTML = '';
+                console.log('Adding all reduxes to all-list');
+                reduxesDatabase.forEach(redux => {
+                    console.log('Adding redux to all-list:', redux.name);
+                    allList.appendChild(createReduxItem(redux));
+                });
+            } else {
+                console.error('all-list element not found!');
+            }
+            
+            console.log('loadReduxes completed');
         }
         
         function createReduxItem(redux) {
@@ -1707,19 +1734,30 @@
         // Обработчики навигации
         document.querySelectorAll('.nav-icon').forEach((icon) => {
             icon.addEventListener('click', () => {
+                console.log('Navigation clicked');
                 const page = icon.getAttribute('data-page');
+                console.log('Switching to page:', page);
+                
                 document.querySelectorAll('.nav-icon').forEach(i => i.classList.remove('active'));
                 icon.classList.add('active');
                 
                 // Переключение страниц
-                document.getElementById('home-page').style.display = page === 'home' ? 'block' : 'none';
-                document.getElementById('settings-page').style.display = page === 'settings' ? 'block' : 'none';
-                document.getElementById('downloads-page').style.display = page === 'downloads' ? 'block' : 'none';
+                const homePage = document.getElementById('home-page');
+                const settingsPage = document.getElementById('settings-page');
+                const downloadsPage = document.getElementById('downloads-page');
+                
+                if (homePage) homePage.style.display = page === 'home' ? 'block' : 'none';
+                if (settingsPage) settingsPage.style.display = page === 'settings' ? 'block' : 'none';
+                if (downloadsPage) downloadsPage.style.display = page === 'downloads' ? 'block' : 'none';
+                
+                console.log('Pages switched, current page:', page);
                 
                 // Загружаем данные для соответствующих страниц
                 if (page === 'home') {
+                    console.log('Loading reduxes for home page');
                     loadReduxes();
                 } else if (page === 'downloads') {
+                    console.log('Rendering downloads');
                     renderDownloads();
                 }
             });
@@ -2455,41 +2493,42 @@
                 clearCompletedBtn.addEventListener('click', clearCompletedDownloads);
             }
         }
-            
-            const interval = setInterval(() => {
-                progress += Math.random() * 10;
-                if (progress >= 100) {
-                    progress = 100;
-                    clearInterval(interval);
-                    completeDownload(downloadId);
-                } else {
-                    const speed = (Math.random() * 10 + 5).toFixed(1) + ' MB/s';
-                    const downloaded = (progress * 2.5).toFixed(1) + ' MB';
-                    const total = '250 MB';
-                    updateDownloadProgress(downloadId, progress, speed, downloaded, total);
-                }
-            }, 500);
-        }
 
         // Загружаем данные при старте
         document.addEventListener('DOMContentLoaded', () => {
-            loadPersistedData(); // Загружаем сохраненные данные
-            loadReduxes();
-            loadSettingsUI();
-            setupDownloadControls(); // Настраиваем новые элементы управления загрузками
+            console.log('DOM Content Loaded - Starting initialization...');
             
-            // Показываем главную страницу по умолчанию
-            document.getElementById('home-page').style.display = 'block';
-            document.getElementById('settings-page').style.display = 'none';
-            document.getElementById('downloads-page').style.display = 'none';
-            
-            // Привязки контролов настроек
-            const autoInstall = document.getElementById('autoInstallToggle');
-            const desktopShortcut = document.getElementById('desktopShortcutToggle');
-            const languageSelect = document.getElementById('languageSelect');
-            if (autoInstall) autoInstall.addEventListener('change', (e) => saveSetting('autoInstall', e.target.checked));
-            if (desktopShortcut) desktopShortcut.addEventListener('change', (e) => saveSetting('createDesktopShortcut', e.target.checked));
-            if (languageSelect) languageSelect.addEventListener('change', (e) => saveSetting('language', e.target.value));
+            try {
+                loadPersistedData(); // Загружаем сохраненные данные
+                console.log('Persisted data loaded');
+                
+                loadReduxes();
+                console.log('Reduxes loaded');
+                
+                loadSettingsUI();
+                console.log('Settings UI loaded');
+                
+                setupDownloadControls(); // Настраиваем новые элементы управления загрузками
+                console.log('Download controls setup');
+                
+                // Показываем главную страницу по умолчанию
+                document.getElementById('home-page').style.display = 'block';
+                document.getElementById('settings-page').style.display = 'none';
+                document.getElementById('downloads-page').style.display = 'none';
+                console.log('Pages initialized');
+                
+                // Привязки контролов настроек
+                const autoInstall = document.getElementById('autoInstallToggle');
+                const desktopShortcut = document.getElementById('desktopShortcutToggle');
+                const languageSelect = document.getElementById('languageSelect');
+                if (autoInstall) autoInstall.addEventListener('change', (e) => saveSetting('autoInstall', e.target.checked));
+                if (desktopShortcut) desktopShortcut.addEventListener('change', (e) => saveSetting('createDesktopShortcut', e.target.checked));
+                if (languageSelect) languageSelect.addEventListener('change', (e) => saveSetting('language', e.target.value));
+                
+                console.log('Initialization completed successfully');
+            } catch (error) {
+                console.error('Error during initialization:', error);
+            }
         });
     </script>
 </body>
