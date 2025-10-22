@@ -11,8 +11,21 @@ const DownloadManager = require('./download-manager');
 let mainWindow;
 let downloadManager;
 
+// Безопасная отправка сообщений в webContents
+function safeSendToRenderer(channel, data) {
+  try {
+    if (mainWindow && !mainWindow.isDestroyed() && mainWindow.webContents) {
+      safeSendToRenderer(channel, data);
+      return true;
+    }
+  } catch (error) {
+    console.error('Ошибка отправки сообщения в renderer:', error);
+  }
+  return false;
+}
+
 // Текущая версия лаунчера
-const CURRENT_VERSION = '1.0.6';
+const CURRENT_VERSION = '1.0.7';
 
 // Путь к настройкам приложения
 const settingsPath = path.join(app.getPath('userData'), 'settings.json');
@@ -166,7 +179,7 @@ async function detectGTAPath() {
         foundPath = selectedPath;
       } else {
         if (mainWindow) {
-          mainWindow.webContents.send('ui-message', {
+          safeSendToRenderer('ui-message', {
             title: 'Неверная папка',
             message: 'В выбранной папке не найден файл GTA5.exe',
             buttons: ['OK']
@@ -182,7 +195,7 @@ async function detectGTAPath() {
     saveSettings();
 
     if (mainWindow) {
-      mainWindow.webContents.send('ui-message', {
+      safeSendToRenderer('ui-message', {
         title: 'Папка найдена',
         message: `Папка с GTA 5 обнаружена:\n${foundPath}`,
         buttons: ['OK']
@@ -190,7 +203,7 @@ async function detectGTAPath() {
     }
 
     if (mainWindow) {
-      mainWindow.webContents.send('gta-path-detected', foundPath);
+      safeSendToRenderer('gta-path-detected', foundPath);
     }
   }
 }
@@ -235,7 +248,7 @@ ipcMain.on('browse-gta-path', async (event) => {
       event.reply('gta-path-selected', selectedPath);
     } else {
       if (mainWindow) {
-        mainWindow.webContents.send('ui-message', {
+        safeSendToRenderer('ui-message', {
           title: 'Ошибка',
           message: 'В выбранной папке не найден файл GTA5.exe',
           buttons: ['OK']
@@ -388,11 +401,11 @@ ipcMain.handle('launch-game', async () => {
       if (error) {
         console.error('Ошибка запуска игры:', error);
         if (mainWindow) {
-          mainWindow.webContents.send('game-launch-error', error.message);
+          safeSendToRenderer('game-launch-error', error.message);
         }
       } else {
         if (mainWindow) {
-          mainWindow.webContents.send('game-launched');
+          safeSendToRenderer('game-launched');
         }
       }
     });
@@ -433,7 +446,7 @@ ipcMain.on('check-updates-manual', async (event) => {
     const updateInfo = await checkForUpdates();
     
     if (mainWindow) {
-      mainWindow.webContents.send('update-check-result', {
+      safeSendToRenderer('update-check-result', {
         hasUpdate: updateInfo.hasUpdate,
         version: updateInfo.hasUpdate ? updateInfo.version : CURRENT_VERSION
       });
@@ -441,7 +454,7 @@ ipcMain.on('check-updates-manual', async (event) => {
   } catch (error) {
     console.error('Ошибка проверки обновлений:', error);
     if (mainWindow) {
-      mainWindow.webContents.send('update-check-result', {
+      safeSendToRenderer('update-check-result', {
         hasUpdate: false,
         error: error.message
       });
@@ -475,7 +488,7 @@ ipcMain.handle('run-installation', async (event, options) => {
       if (progress > 90) progress = 90;
 
       if (mainWindow) {
-        mainWindow.webContents.send('install-progress', {
+        safeSendToRenderer('install-progress', {
           percent: Math.round(progress),
           title: getInstallStepTitle(progress),
           subtitle: getInstallStepSubtitle(progress)
@@ -486,7 +499,7 @@ ipcMain.handle('run-installation', async (event, options) => {
     // Шаг 1: Создание папок
     await new Promise(resolve => setTimeout(resolve, 1000));
     progress = 10;
-    mainWindow.webContents.send('install-progress', {
+    safeSendToRenderer('install-progress', {
       percent: Math.round(progress),
       title: 'Создание папок...',
       subtitle: 'Подготовка структуры приложения'
@@ -498,7 +511,7 @@ ipcMain.handle('run-installation', async (event, options) => {
     // Шаг 2: Копирование файлов
     await new Promise(resolve => setTimeout(resolve, 1500));
     progress = 30;
-    mainWindow.webContents.send('install-progress', {
+    safeSendToRenderer('install-progress', {
       percent: Math.round(progress),
       title: 'Копирование файлов...',
       subtitle: 'Перенос файлов приложения'
@@ -523,7 +536,7 @@ ipcMain.handle('run-installation', async (event, options) => {
     // Шаг 3: Установка зависимостей
     await new Promise(resolve => setTimeout(resolve, 2000));
     progress = 60;
-    mainWindow.webContents.send('install-progress', {
+    safeSendToRenderer('install-progress', {
       percent: Math.round(progress),
       title: 'Установка зависимостей...',
       subtitle: 'Настройка компонентов'
@@ -532,7 +545,7 @@ ipcMain.handle('run-installation', async (event, options) => {
     // Шаг 4: Создание ярлыков
     await new Promise(resolve => setTimeout(resolve, 1000));
     progress = 80;
-    mainWindow.webContents.send('install-progress', {
+    safeSendToRenderer('install-progress', {
       percent: Math.round(progress),
       title: 'Создание ярлыков...',
       subtitle: 'Настройка интеграции с системой'
@@ -549,7 +562,7 @@ ipcMain.handle('run-installation', async (event, options) => {
     // Шаг 5: Завершение
     progress = 100;
     clearInterval(progressInterval);
-    mainWindow.webContents.send('install-progress', {
+    safeSendToRenderer('install-progress', {
       percent: 100,
       title: 'Установка завершена!',
       subtitle: 'Reduxion Launcher готов к использованию'
@@ -843,7 +856,7 @@ ipcMain.on('download-redux', async (event, data) => {
       }).on('error', (err) => {
         if (isCancelled) return;
         console.error('Ошибка загрузки:', err);
-        mainWindow.webContents.send('download-error', {
+        safeSendToRenderer('download-error', {
           downloadId: downloadId,
           error: err.message
         });
@@ -859,7 +872,7 @@ ipcMain.on('download-redux', async (event, data) => {
       
       if (response.statusCode !== 200) {
         const error = `HTTP ${response.statusCode}`;
-        mainWindow.webContents.send('download-error', {
+        safeSendToRenderer('download-error', {
           downloadId: downloadId,
           error: error
         });
@@ -885,7 +898,7 @@ ipcMain.on('download-redux', async (event, data) => {
         const total = (totalBytes / 1024 / 1024).toFixed(1) + ' MB';
         
         // Отправляем прогресс
-        mainWindow.webContents.send('download-progress', {
+        safeSendToRenderer('download-progress', {
           downloadId: downloadId,
           progress: progress,
           speed: speed,
@@ -904,7 +917,7 @@ ipcMain.on('download-redux', async (event, data) => {
         
         file.close(() => {
           console.log('Загрузка завершена:', filePath);
-          mainWindow.webContents.send('download-complete', {
+          safeSendToRenderer('download-complete', {
             downloadId: downloadId,
             filePath: filePath
           });
@@ -914,7 +927,7 @@ ipcMain.on('download-redux', async (event, data) => {
       file.on('error', (err) => {
         if (isCancelled) return;
         console.error('Ошибка записи файла:', err);
-        mainWindow.webContents.send('download-error', {
+        safeSendToRenderer('download-error', {
           downloadId: downloadId,
           error: err.message
         });
@@ -949,7 +962,7 @@ ipcMain.on('download-redux', async (event, data) => {
     
   } catch (error) {
     console.error('Ошибка при загрузке:', error);
-    mainWindow.webContents.send('download-error', {
+    safeSendToRenderer('download-error', {
       downloadId: downloadId,
       error: error.message
     });
@@ -970,6 +983,11 @@ ipcMain.on('cancel-download', (event, data) => {
     }
     
     activeDownloads.delete(downloadId);
+    
+    // Уведомляем frontend об отмене
+    safeSendToRenderer('download-cancelled', {
+      downloadId: downloadId
+    });
   }
 });
 
@@ -981,7 +999,7 @@ ipcMain.on('install-downloaded-redux', async (event, data) => {
     console.log('Установка редукса:', reduxId, 'из', filePath);
     
     if (!appSettings.gtaPath || !fs.existsSync(appSettings.gtaPath)) {
-      mainWindow.webContents.send('download-error', {
+      safeSendToRenderer('download-error', {
         downloadId: downloadId,
         error: 'Путь к GTA 5 не указан'
       });
@@ -993,7 +1011,7 @@ ipcMain.on('install-downloaded-redux', async (event, data) => {
     const isZip = filePath.endsWith('.zip');
     
     if (!isRar && !isZip) {
-      mainWindow.webContents.send('download-error', {
+      safeSendToRenderer('download-error', {
         downloadId: downloadId,
         error: 'Неподдерживаемый формат архива'
       });
@@ -1040,7 +1058,7 @@ ipcMain.on('install-downloaded-redux', async (event, data) => {
     }
     
     console.log('Установка завершена');
-    mainWindow.webContents.send('install-complete', {
+    safeSendToRenderer('install-complete', {
       downloadId: downloadId,
       reduxId: reduxId
     });
@@ -1058,7 +1076,7 @@ ipcMain.on('install-downloaded-redux', async (event, data) => {
     
   } catch (error) {
     console.error('Ошибка установки:', error);
-    mainWindow.webContents.send('download-error', {
+    safeSendToRenderer('download-error', {
       downloadId: downloadId,
       error: error.message
     });
@@ -1077,13 +1095,13 @@ app.whenReady().then(async () => {
      // Ждем загрузки окна
      mainWindow.webContents.on('did-finish-load', async () => {
        // Отправляем статус загрузки лаунчера
-       mainWindow.webContents.send('loading-status', 'Загрузка...');
+       safeSendToRenderer('loading-status', 'Загрузка...');
        
        // Имитируем загрузку лаунчера
        await new Promise(resolve => setTimeout(resolve, 1500));
        
        // Отправляем статус загрузки
-       mainWindow.webContents.send('loading-status', 'Загрузка интерфейса...');
+       safeSendToRenderer('loading-status', 'Загрузка интерфейса...');
        
        // Даем время увидеть текст загрузки
        await new Promise(resolve => setTimeout(resolve, 800));
@@ -1101,14 +1119,14 @@ app.whenReady().then(async () => {
        
        if (false) {
          console.log('Найдено обновление!');
-         mainWindow.webContents.send('loading-status', 'Найдено обновление!');
+         safeSendToRenderer('loading-status', 'Найдено обновление!');
          
          await new Promise(resolve => setTimeout(resolve, 1000));
          
          // Встроенное подтверждение обновления
          const confirmId = 'upd-' + Date.now();
          if (mainWindow) {
-           mainWindow.webContents.send('ui-confirm', {
+           safeSendToRenderer('ui-confirm', {
              id: confirmId,
              title: 'Доступно обновление',
              message: 'Найдена новая версия Reduxion Launcher!\nУстановить обновление сейчас?',
@@ -1128,7 +1146,7 @@ app.whenReady().then(async () => {
          });
 
          if (userConfirmed) {
-           mainWindow.webContents.send('loading-status', 'Скачивание обновления...');
+           safeSendToRenderer('loading-status', 'Скачивание обновления...');
            console.log('Скачивание обновления...');
            try {
              await downloadAndRunInstaller(updateInfo.installerUrl);
@@ -1138,7 +1156,7 @@ app.whenReady().then(async () => {
            } catch (error) {
              console.error('Ошибка при обновлении:', error);
              if (mainWindow) {
-               mainWindow.webContents.send('ui-message', {
+               safeSendToRenderer('ui-message', {
                  title: 'Ошибка обновления',
                  message: 'Не удалось скачать обновление: ' + error.message,
                  buttons: ['OK']
@@ -1149,9 +1167,9 @@ app.whenReady().then(async () => {
        }
        
        // Обновлений нет, загружаем основной интерфейс
-       mainWindow.webContents.send('loading-status', 'Загрузка интерфейса...');
+       safeSendToRenderer('loading-status', 'Загрузка интерфейса...');
        await new Promise(resolve => setTimeout(resolve, 500));
-       mainWindow.webContents.send('loading-complete');
+       safeSendToRenderer('loading-complete');
      });
      
      console.log('Приложение инициализировано успешно');
@@ -1172,18 +1190,38 @@ app.whenReady().then(async () => {
 // Обработчик закрытия всех окон
 app.on('window-all-closed', () => {
    console.log('Все окна закрыты');
+   
+   // Отменяем все активные загрузки
+   activeDownloads.forEach((download, downloadId) => {
+     console.log('Отмена загрузки при закрытии:', downloadId);
+     if (download.cancel) {
+       download.cancel();
+     }
+   });
+   activeDownloads.clear();
+   
    if (process.platform !== 'darwin') {
      app.quit();
    }
- });
+});
 
 // Обработчик перед выходом из приложения
 app.on('before-quit', (event) => {
    console.log('Приложение завершает работу');
+   
+   // Отменяем все активные загрузки
+   activeDownloads.forEach((download, downloadId) => {
+     console.log('Отмена загрузки при выходе:', downloadId);
+     if (download.cancel) {
+       download.cancel();
+     }
+   });
+   activeDownloads.clear();
+   
    if (mainWindow) {
      mainWindow.removeAllListeners('closed');
    }
- });
+});
 
 // Глобальный обработчик ошибок
 process.on('uncaughtException', (error) => {

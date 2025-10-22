@@ -934,7 +934,7 @@
 
     <div class="main-container">
         <header class="top-bar">
-            <div class="version-badge">v1.0.6 (alpha)</div>
+            <div class="version-badge">v1.0.7 (alpha)</div>
             <div class="window-controls">
                 <button class="window-btn" onclick="minimizeWindow()">−</button>
                 <button class="window-btn" onclick="closeWindow()">×</button>
@@ -1042,7 +1042,7 @@
                         <div class="setting-item">
                             <div class="setting-left">
                                 <div class="setting-label">Версия лаунчера</div>
-                                <div class="setting-value">v1.0.6 (alpha)</div>
+                                <div class="setting-value">v1.0.7 (alpha)</div>
                             </div>
                             <button class="setting-button" onclick="checkUpdatesNow()">Проверить обновления</button>
                         </div>
@@ -1612,6 +1612,19 @@
             renderDownloads();
             showToast('error', `Ошибка загрузки ${download.name}`);
         });
+        
+        // Отмена загрузки
+        ipcRenderer.on('download-cancelled', (event, data) => {
+            const download = activeDownloads.get(data.downloadId);
+            if (!download) return;
+            
+            download.status = 'Отменено';
+            download.state = 'cancelled';
+            
+            saveActiveDownloads(); // Сохраняем состояние
+            renderDownloads();
+            showToast('warn', `Загрузка ${download.name} отменена`);
+        });
 
         function updateDownloadProgress(downloadId, progress, speed, downloaded, total) {
             const download = activeDownloads.get(downloadId);
@@ -1681,18 +1694,13 @@
             const download = activeDownloads.get(downloadId);
             if (!download) return;
             
-            // Помечаем как отменённую
-            download.state = 'cancelled';
-            download.status = 'Отменено';
-            
-            // Отменяем загрузку на бэкенде
-            ipcRenderer.send('cancel-download', { downloadId: downloadId });
-            
-            // Удаляем из активных и сохраняем состояние
-            activeDownloads.delete(downloadId);
+            // Помечаем как отменяемую
+            download.status = 'Отмена...';
             saveActiveDownloads();
             renderDownloads();
-            showToast('warn', 'Загрузка отменена');
+            
+            // Отправляем запрос на отмену в backend
+            ipcRenderer.send('cancel-download', { downloadId: downloadId });
         }
 
         function renderDownloads() {
