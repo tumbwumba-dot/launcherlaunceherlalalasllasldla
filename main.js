@@ -15,7 +15,7 @@ let downloadManager;
 function safeSendToRenderer(channel, data) {
   try {
     if (mainWindow && !mainWindow.isDestroyed() && mainWindow.webContents) {
-      safeSendToRenderer(channel, data);
+      mainWindow.webContents.send(channel, data);
       return true;
     }
   } catch (error) {
@@ -25,7 +25,7 @@ function safeSendToRenderer(channel, data) {
 }
 
 // Текущая версия лаунчера
-const CURRENT_VERSION = '1.0.9';
+const CURRENT_VERSION = '1.1.0';
 
 // Путь к настройкам приложения
 const settingsPath = path.join(app.getPath('userData'), 'settings.json');
@@ -99,7 +99,7 @@ function createMainWindow() {
      console.log('Загрузка файла:', filePath);
      console.log('Файл существует:', require('fs').existsSync(filePath));
 
-     mainWindow.loadFile(targetFile);
+     mainWindow.loadFile(filePath);
 
      // Показываем окно только после полной загрузки
      mainWindow.once('ready-to-show', () => {
@@ -789,202 +789,221 @@ ipcMain.handle('uninstall-redux', async (event, reduxId) => {
   }
 });
 
-// Обработка скачивания редукса
+// Система загрузки редуксов
 const activeDownloads = new Map();
 
-ipcMain.on('download-redux', async (event, data) => {
-  const { downloadId, url, reduxId } = data;
-  
-  try {
-    console.log('=== НАЧАЛО ЗАГРУЗКИ ===');
-    console.log('Download ID:', downloadId);
-    console.log('URL:', url);
-    console.log('Redux ID:', reduxId);
-    
-    const downloadsDir = path.join(app.getPath('userData'), 'downloads');
-    await fs.ensureDir(downloadsDir);
-    console.log('Папка загрузок создана:', downloadsDir);
-    
-    // Определяем расширение из URL
-    const fileExt = url.endsWith('.rar') ? '.rar' : '.zip';
-    const fileName = `${reduxId}${fileExt}`;
-    const filePath = path.join(downloadsDir, fileName);
-    console.log('Путь к файлу:', filePath);
-    
-    // Создаем HTTP запрос
-    const file = fs.createWriteStream(filePath);
-    let downloadedBytes = 0;
-    let totalBytes = 0;
-    let startTime = Date.now();
-    let request = null;
-    let isCancelled = false;
-    
-    console.log('Начинаем HTTP запрос...');
-    
-    const startDownload = (downloadUrl) => {
-      console.log('Запуск загрузки с URL:', downloadUrl);
-      request = https.get(downloadUrl, (response) => {
-        console.log('Получен ответ от сервера:', response.statusCode);
-        
-        // Обработка редиректов
-        if (response.statusCode === 302 || response.statusCode === 301) {
-          console.log('Редирект на:', response.headers.location);
-          request.abort();
-          startDownload(response.headers.location);
-          return;
-        }
-        
-        handleDownload(response);
-      }).on('error', (err) => {
-        if (isCancelled) return;
-        console.error('Ошибка загрузки:', err);
-        safeSendToRenderer('download-error', {
-          downloadId: downloadId,
-          error: err.message
-        });
-        cleanupFile();
+class DownloadTask {
+  constructor(downloadId, url, reduxId, filePath) {
+    this.downloadId = downloadId;
+    this.url = url;
+    this.reduxId = reduxId;
+    this.filePath = filePath;
+    this.request = null;
+    this.fileStream = null;
+    this.cancelled = false;
+    this.downloadedBytes = 0;
+    this.totalBytes = 0;
+    this.startTime = Date.now();
+  }
+
+  start() {
+    return new Promise((resolve, reject) => {
+      if (this.cancelled) {
+        reject(new Error('Download cancelled'));
+        return;
+      }
+
+      this.fileStream = fs.createWriteStream(this.filePath);
+      this.fileStream.on('error', (err) => {
+        console.error('File stream error:', err);
+        this.cleanup();
+        reject(err);
       });
-    };
-    
-    function handleDownload(response) {
-      console.log('Обработка ответа загрузки...');
-      
-      if (isCancelled) {
-        console.log('Загрузка отменена, прерываем обработку');
-        response.destroy();
+
+      this.makeRequest(this.url, resolve, reject);
+    });
+  }
+
+  makeRequest(url, resolve, reject) {
+    console.log('Making request to:', url);
+
+    this.request = https.get(url, (response) => {
+      // Handle redirects
+      if (response.statusCode === 301 || response.statusCode === 302) {
+        const redirectUrl = response.headers.location;
+        console.log('Redirect to:', redirectUrl);
+        this.request.abort();
+        this.makeRequest(redirectUrl, resolve, reject);
         return;
       }
-      
+
       if (response.statusCode !== 200) {
-        const error = `HTTP ${response.statusCode}`;
-        console.error('Ошибка HTTP:', error);
-        safeSendToRenderer('download-error', {
-          downloadId: downloadId,
-          error: error
-        });
-        cleanupFile();
+        const error = new Error(`HTTP ${response.statusCode}`);
+        console.error('HTTP error:', error.message);
+        this.cleanup();
+        reject(error);
         return;
       }
-      
-      totalBytes = parseInt(response.headers['content-length'], 10);
-      console.log('Размер файла:', totalBytes, 'байт');
-      
+
+      this.totalBytes = parseInt(response.headers['content-length'], 10) || 0;
+      console.log('Total size:', this.totalBytes, 'bytes');
+
       response.on('data', (chunk) => {
-        if (isCancelled) {
+        if (this.cancelled) {
           response.destroy();
           return;
         }
-        
-        downloadedBytes += chunk.length;
-        
-        // Вычисляем скорость
-        const elapsedTime = (Date.now() - startTime) / 1000;
-        const speed = (downloadedBytes / elapsedTime / 1024 / 1024).toFixed(1) + ' MB/s';
-        const progress = Math.round((downloadedBytes / totalBytes) * 100);
-        const downloaded = (downloadedBytes / 1024 / 1024).toFixed(1) + ' MB';
-        const total = (totalBytes / 1024 / 1024).toFixed(1) + ' MB';
-        
-        // Отправляем прогресс
-        safeSendToRenderer('download-progress', {
-          downloadId: downloadId,
-          progress: progress,
-          speed: speed,
-          downloaded: downloaded,
-          total: total
-        });
+
+        this.downloadedBytes += chunk.length;
+        this.sendProgress();
       });
-      
-      response.pipe(file);
-      
-      file.on('finish', () => {
-        if (isCancelled) {
-          cleanupFile();
+
+      response.on('end', () => {
+        if (this.cancelled) {
+          this.cleanup();
+          reject(new Error('Download cancelled'));
           return;
         }
-        
-        file.close(() => {
-          console.log('Загрузка завершена:', filePath);
-          safeSendToRenderer('download-complete', {
-            downloadId: downloadId,
-            filePath: filePath
-          });
+
+        this.fileStream.end(() => {
+          console.log('Download completed:', this.filePath);
+          resolve();
         });
       });
-      
-      file.on('error', (err) => {
-        if (isCancelled) return;
-        console.error('Ошибка записи файла:', err);
-        safeSendToRenderer('download-error', {
-          downloadId: downloadId,
-          error: err.message
-        });
-        cleanupFile();
+
+      response.on('error', (err) => {
+        console.error('Response error:', err);
+        this.cleanup();
+        reject(err);
       });
+
+      response.pipe(this.fileStream);
+    });
+
+    this.request.on('error', (err) => {
+      console.error('Request error:', err);
+      this.cleanup();
+      reject(err);
+    });
+
+    this.request.setTimeout(60000, () => {
+      console.error('Request timeout');
+      this.request.abort();
+      this.cleanup();
+      reject(new Error('Download timeout'));
+    });
+  }
+
+  sendProgress() {
+    if (!mainWindow || mainWindow.isDestroyed()) return;
+
+    const elapsedTime = (Date.now() - this.startTime) / 1000;
+    const speed = elapsedTime > 0 ? (this.downloadedBytes / elapsedTime / 1024 / 1024).toFixed(1) + ' MB/s' : '0 MB/s';
+    const progress = this.totalBytes > 0 ? Math.round((this.downloadedBytes / this.totalBytes) * 100) : 0;
+    const downloaded = (this.downloadedBytes / 1024 / 1024).toFixed(1) + ' MB';
+    const total = (this.totalBytes / 1024 / 1024).toFixed(1) + ' MB';
+
+    try {
+      mainWindow.webContents.send('download-progress', {
+        downloadId: this.downloadId,
+        progress,
+        speed,
+        downloaded,
+        total
+      });
+    } catch (err) {
+      console.error('Error sending progress:', err);
+    }
+  }
+
+  cancel() {
+    console.log('Cancelling download:', this.downloadId);
+    this.cancelled = true;
+    
+    if (this.request) {
+      this.request.abort();
+      this.request = null;
     }
     
-    function cleanupFile() {
+    this.cleanup();
+  }
+
+  cleanup() {
+    if (this.fileStream) {
       try {
-        file.close(() => {
-          fs.unlink(filePath, (err) => {
-            if (err) console.error('Ошибка удаления файла:', err);
-          });
-        });
-      } catch (e) {
-        console.error('Ошибка очистки:', e);
+        this.fileStream.end();
+        this.fileStream.destroy();
+        this.fileStream = null;
+      } catch (err) {
+        console.error('Error closing file stream:', err);
       }
     }
-    
-    activeDownloads.set(downloadId, { 
-      url, 
-      filePath, 
-      request,
-      cancel: () => {
-        isCancelled = true;
-        if (request) request.abort();
-        cleanupFile();
+
+    // Delete file after a delay
+    setTimeout(() => {
+      if (fs.existsSync(this.filePath)) {
+        fs.unlink(this.filePath, (err) => {
+          if (err) console.error('Error deleting file:', err);
+          else console.log('File deleted:', this.filePath);
+        });
       }
-    });
-    
-    console.log('Запускаем загрузку...');
-    startDownload(url);
-    
+    }, 500);
+  }
+}
+
+ipcMain.on('download-redux', async (event, data) => {
+  const { downloadId, url, reduxId } = data;
+
+  try {
+    console.log('=== NEW DOWNLOAD ===');
+    console.log('ID:', downloadId);
+    console.log('URL:', url);
+
+    const downloadsDir = path.join(app.getPath('userData'), 'downloads');
+    await fs.ensureDir(downloadsDir);
+
+    const fileExt = url.endsWith('.rar') ? '.rar' : '.zip';
+    const fileName = `${reduxId}${fileExt}`;
+    const filePath = path.join(downloadsDir, fileName);
+
+    const task = new DownloadTask(downloadId, url, reduxId, filePath);
+    activeDownloads.set(downloadId, task);
+
+    await task.start();
+
+    if (!task.cancelled && mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('download-complete', {
+        downloadId,
+        filePath
+      });
+    }
+
   } catch (error) {
-    console.error('Ошибка при загрузке:', error);
-    safeSendToRenderer('download-error', {
-      downloadId: downloadId,
-      error: error.message
-    });
+    console.error('Download error:', error);
+    
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('download-error', {
+        downloadId,
+        error: error.message
+      });
+    }
+  } finally {
+    activeDownloads.delete(downloadId);
   }
 });
 
 // Отмена загрузки
 ipcMain.on('cancel-download', (event, data) => {
   const { downloadId } = data;
-  const download = activeDownloads.get(downloadId);
-  
-  if (download) {
-    console.log('Отмена загрузки:', downloadId);
-    
-    // Вызываем функцию отмены
-    if (download.cancel) {
-      download.cancel();
-    }
-    
-    // Удаляем из активных загрузок
+  const task = activeDownloads.get(downloadId);
+
+  if (task) {
+    console.log('Cancelling download:', downloadId);
+    task.cancel();
     activeDownloads.delete(downloadId);
-    
-    // Уведомляем frontend об отмене
-    safeSendToRenderer('download-cancelled', {
-      downloadId: downloadId
-    });
-    
     console.log('Загрузка отменена успешно:', downloadId);
   } else {
     console.log('Загрузка не найдена для отмены:', downloadId);
-    // Все равно уведомляем frontend
-    safeSendToRenderer('download-cancelled', {
-      downloadId: downloadId
-    });
   }
 });
 
