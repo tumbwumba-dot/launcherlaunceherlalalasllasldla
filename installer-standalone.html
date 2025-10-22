@@ -5,48 +5,150 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reduxion Installer - Majestic Style</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap');
+        @font-face {
+            font-family: 'Proxima Nova';
+            src: url('fonts/ProximaNova-Regular.woff2') format('woff2');
+            font-weight: 400;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Proxima Nova';
+            src: url('fonts/ProximaNova-Semibold.woff2') format('woff2');
+            font-weight: 600;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Proxima Nova';
+            src: url('fonts/ProximaNova-Bold.woff2') format('woff2');
+            font-weight: 700;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Proxima Nova';
+            src: url('fonts/ProximaNova-Extrabld.woff2') format('woff2');
+            font-weight: 800;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Proxima Nova';
+            src: url('fonts/ProximaNova-Black.woff2') format('woff2');
+            font-weight: 900;
+            font-style: normal;
+        }
 
         :root {
-            --primary-bg: #0A0A0F;
-            --accent-color: #E91E63;
-            --accent-dark: #C2185B;
+            --primary-bg: #0f0f0f;
+            --accent-color: #e81c5a;
+            --accent-dark: #ff4569;
             --text-primary: #FFFFFF;
             --text-secondary: #B8B8D0;
-            --font-main: 'Montserrat', sans-serif;
-            --gradient-primary: linear-gradient(135deg, #E91E63 0%, #9C27B0 100%);
+            --font-main: 'Proxima Nova', sans-serif;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
 
         body {
             font-family: var(--font-main);
-            background-color: var(--primary-bg);
+            background: #0a0a0c;
             color: var(--text-primary);
             height: 100vh;
+            overflow: hidden;
+        }
+
+        .main-layout {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 72px;
+            background: #0f0f12;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo-small {
+            font-size: 28px;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 40px;
+            background: linear-gradient(135deg, #e91e63 0%, #c2185b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            height: 48px;
+            background: #13141a;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
             align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            background: 
-                radial-gradient(ellipse 800px 600px at 50% 50%, rgba(233, 30, 99, 0.15), transparent 70%),
-                var(--primary-bg);
+            justify-content: space-between;
+            padding: 0 24px;
+            -webkit-app-region: drag;
+            position: relative;
+            z-index: 3000;
+        }
+
+        .version-badge {
+            font-size: 11px;
+            font-weight: 600;
+            color: #888899;
+            letter-spacing: 0.5px;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 8px;
+            -webkit-app-region: no-drag;
+        }
+
+        .window-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            color: #888899;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .window-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
         }
 
         .installer-container {
-            position: relative;
-            z-index: 2;
+            flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
-            width: 100%;
-            max-width: 700px;
             padding: 40px;
         }
 
@@ -54,13 +156,9 @@
             font-size: 48px;
             font-weight: 900;
             font-style: italic;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--text-primary);
             margin-bottom: 80px;
             letter-spacing: 2px;
-            text-shadow: 0 0 40px rgba(233, 30, 99, 0.3);
         }
 
         .connection-title {
@@ -88,7 +186,7 @@
         .progress-bar {
             width: 100%;
             height: 6px;
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: #1a1a1a;
             border-radius: 3px;
             overflow: hidden;
             position: relative;
@@ -97,7 +195,7 @@
         .progress-fill {
             width: 0%;
             height: 100%;
-            background: var(--gradient-primary);
+            background: linear-gradient(135deg, #e91e63 0%, #c2185b 100%);
             border-radius: 3px;
             transition: width 0.4s ease-out;
             box-shadow: 0 0 20px rgba(233, 30, 99, 0.6);
@@ -132,45 +230,31 @@
         }
 
         .cancel-button-wrapper {
-            position: fixed;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
+            width: 100%;
             display: flex;
-            flex-direction: row;
             align-items: center;
             justify-content: center;
-            gap: 12px;
-            z-index: 10;
+            margin-top: 30px;
         }
 
         .cancel-button {
-            background: rgba(30, 30, 40, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: var(--text-secondary);
-            padding: 12px 24px;
+            padding: 10px 20px;
+            background: rgba(233, 30, 99, 0.2);
+            border: 1px solid rgba(233, 30, 99, 0.3);
             border-radius: 8px;
+            color: #e91e63;
+            font-size: 13px;
+            font-weight: 700;
             cursor: pointer;
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            font-size: 14px;
-            font-weight: 600;
-            font-family: var(--font-main);
             gap: 8px;
+            font-family: var(--font-main);
         }
 
         .cancel-button:hover {
-            background: rgba(233, 30, 99, 0.2);
-            border-color: var(--accent-color);
-            color: var(--text-primary);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(233, 30, 99, 0.3);
-        }
-
-        .cancel-button:active {
-            transform: translateY(0);
+            background: rgba(233, 30, 99, 0.3);
         }
 
         /* Анимация появления */
@@ -226,28 +310,54 @@
     </style>
 </head>
 <body>
-    <div class="installer-container">
-        <h1 class="logo">Reduxion Launcher</h1>
+    <div class="main-layout">
+        <aside class="sidebar">
+            <div class="logo-small">R</div>
+        </aside>
 
-        <h2 class="connection-title">УСТАНОВКА</h2>
-        <p class="status-text loading" id="status-text">ПОДГОТОВКА К УСТАНОВКЕ</p>
+        <div class="main-content">
+            <header class="top-bar">
+                <div class="version-badge">УСТАНОВЩИК v1.0.5 (alpha)</div>
+            </header>
 
-        <div class="progress-bar-container">
-            <div class="progress-bar">
-                <div class="progress-fill" id="progress-fill"></div>
+            <div class="installer-container">
+                <h1 class="logo">Reduxion Launcher</h1>
+
+                <h2 class="connection-title">УСТАНОВКА</h2>
+                <p class="status-text loading" id="status-text">ПОДГОТОВКА К УСТАНОВКЕ</p>
+
+                <div class="progress-bar-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div class="progress-details" id="progress-details">0 из 5</div>
+                </div>
+                
+                <div class="cancel-button-wrapper">
+                    <button class="cancel-button" onclick="cancelInstallation()">
+                        <span>✕</span>
+                        <span>Отмена</span>
+                    </button>
+                </div>
             </div>
-            <div class="progress-details" id="progress-details">0 из 5</div>
         </div>
     </div>
 
-    <div class="cancel-button-wrapper">
-            <button class="cancel-button" onclick="cancelInstallation()">
-                <span>✕</span>
-                <span>Отмена</span>
-            </button>
-    </div>
-
     <script>
+        function minimizeWindow() {
+            if (typeof require !== 'undefined') {
+                const { ipcRenderer } = require('electron');
+                ipcRenderer.send('minimize-window');
+            }
+        }
+
+        function closeWindow() {
+            if (typeof require !== 'undefined') {
+                const { ipcRenderer } = require('electron');
+                ipcRenderer.send('close-window');
+            }
+        }
+
         if (typeof require !== 'undefined') {
             const { ipcRenderer } = require('electron');
 
@@ -279,10 +389,17 @@
                 document.getElementById('status-text').textContent = 'УСТАНОВКА ЗАВЕРШЕНА';
                 document.getElementById('status-text').classList.remove('loading');
                 document.getElementById('progress-fill').style.width = '100%';
-                document.getElementById('progress-details').textContent = 'Готово!';
+                document.getElementById('progress-details').textContent = 'Запуск лаунчера...';
                 
+                // Скрываем кнопку отмены
+                const cancelBtn = document.querySelector('.cancel-button-wrapper');
+                if (cancelBtn) {
+                    cancelBtn.style.display = 'none';
+                }
+                
+                // Автоматически запускаем через 2 секунды
                 setTimeout(() => {
-                    ipcRenderer.send('close-installer');
+                    ipcRenderer.send('launch-app');
                 }, 2000);
             });
 

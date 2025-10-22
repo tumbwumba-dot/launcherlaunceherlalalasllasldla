@@ -2,732 +2,2016 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reduxion Launcher - Majestic Style</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>Reduxion Launcher</title>
     <style>
-        /* Design System */
-        :root {
-            --primary: #E91E63;
-            --primary-dark: #C2185B;
-            --secondary: #9C27B0;
-            --bg-primary: #0A0A0F;
-            --bg-secondary: #151520;
-            --bg-card: #252535;
-            --text-primary: #FFFFFF;
-            --text-secondary: #B8B8D0;
-            --gradient-primary: linear-gradient(135deg, #E91E63 0%, #9C27B0 100%);
-            --gradient-secondary: linear-gradient(135deg, #FF5722 0%, #E91E63 100%);
-            --shadow-glow: 0 0 20px rgba(233, 30, 99, 0.3);
-            --radius-md: 12px;
-            --radius-lg: 16px;
+        @font-face {
+            font-family: 'Proxima Nova';
+            src: url('fonts/ProximaNova-Regular.woff2') format('woff2');
+            font-weight: 400;
+            font-style: normal;
         }
-
+        
+        @font-face {
+            font-family: 'Proxima Nova';
+            src: url('fonts/ProximaNova-RegularIt.woff2') format('woff2');
+            font-weight: 400;
+            font-style: italic;
+        }
+        
+        @font-face {
+            font-family: 'Proxima Nova';
+            src: url('fonts/ProximaNova-Semibold.woff2') format('woff2');
+            font-weight: 600;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Proxima Nova';
+            src: url('fonts/ProximaNova-SemiboldIt.woff2') format('woff2');
+            font-weight: 600;
+            font-style: italic;
+        }
+        
+        @font-face {
+            font-family: 'Proxima Nova';
+            src: url('fonts/ProximaNova-Bold.woff2') format('woff2');
+            font-weight: 700;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Proxima Nova';
+            src: url('fonts/ProximaNova-BoldIt.woff2') format('woff2');
+            font-weight: 700;
+            font-style: italic;
+        }
+        
+        @font-face {
+            font-family: 'Proxima Nova';
+            src: url('fonts/ProximaNova-Extrabld.woff2') format('woff2');
+            font-weight: 800;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Proxima Nova';
+            src: url('fonts/ProximaNova-Black.woff2') format('woff2');
+            font-weight: 900;
+            font-style: normal;
+        }
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            font-family: 'Proxima Nova', sans-serif;
         }
-
+        
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            overflow: hidden;
-        }
-
-        .launcher-container {
-            display: flex;
+            font-family: 'Proxima Nova', sans-serif;
+            background: #1e1e1e;
+            color: #FFFFFF;
             height: 100vh;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 80px;
-            background: var(--bg-secondary);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             flex-direction: column;
-            align-items: center;
-            padding: 24px 0;
+            overflow: hidden;
         }
-
-        .sidebar-logo {
-            width: 48px;
-            height: 48px;
-            background: var(--gradient-primary);
-            border-radius: 12px;
+        
+        button, input, select, textarea {
+            font-family: 'Montserrat', sans-serif !important;
+        }
+        
+        /* Кастомный скроллбар в стиле Majestic */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #e81c5a;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ff4569;
+        }
+        
+        ::-webkit-scrollbar-corner {
+            background: #1a1a1a;
+        }
+        
+        .title-bar {
+            height: 40px;
+            background: #2a2a2a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid #333;
+            -webkit-app-region: drag;
+        }
+        
+        .title-bar-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #B8B8D0;
+            letter-spacing: 1px;
+            -webkit-app-region: drag;
+        }
+        
+        .title-bar-controls {
+            display: flex;
+            gap: 10px;
+            -webkit-app-region: no-drag;
+        }
+        
+        .title-bar-button {
+            width: 30px;
+            height: 30px;
+            background: #333;
+            border: none;
+            border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            font-weight: 900;
-            margin-bottom: 40px;
-            box-shadow: var(--shadow-glow);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #FFFFFF;
+            font-size: 14px;
         }
-
-        .sidebar-nav {
+        
+        .title-bar-button:hover {
+            background: #444;
+        }
+        
+        .title-bar-button.close:hover {
+            background: #e91e63;
+        }
+        
+        /* Экран загрузки */
+        .loading-screen {
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        
+        .loading-screen.hidden {
+            display: none;
+        }
+        
+        .logo {
+            font-size: 72px;
+            font-weight: 900;
+            font-style: italic;
+            color: #ffffff;
+            margin-bottom: 20px;
+            letter-spacing: 3px;
+        }
+        
+        .subtitle {
+            font-size: 18px;
+            color: #B8B8D0;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 40px;
+        }
+        
+        .loading-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .loading-spinner {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            background: #e81c5a;
+            border-radius: 50%;
+            animation: dotBounce 1.4s ease-in-out infinite;
+        }
+        
+        .loading-dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+        
+        .loading-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .loading-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes dotBounce {
+            0%, 80%, 100% {
+                transform: translateY(0);
+                opacity: 0.5;
+            }
+            40% {
+                transform: translateY(-12px);
+                opacity: 1;
+            }
+        }
+        
+        .loading-text {
+            font-size: 14px;
+            color: #B8B8D0;
+            font-weight: 600;
+        }
+        
+        /* Экран приветствия */
+        .welcome-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            flex: 1;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        .welcome-screen.active {
+            display: flex;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .auth-container {
+            width: 100%;
+            max-width: 400px;
+            margin-top: 40px;
+        }
+        
+        .auth-tabs {
+            display: flex;
+            gap: 2px;
+            background: #1A1A25;
+            border-radius: 12px 12px 0 0;
+            padding: 4px;
+        }
+        
+        .auth-tab {
+            flex: 1;
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            color: #B8B8D0;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .auth-tab.active {
+            background: #e81c5a;
+            color: white;
+        }
+        
+        .auth-form {
+            background: #1a1a1a;
+            padding: 32px;
+            border-radius: 0 0 12px 12px;
             display: flex;
             flex-direction: column;
             gap: 16px;
         }
-
-        .nav-button {
-            width: 48px;
-            height: 48px;
-            background: transparent;
+        
+        .auth-input {
+            width: 100%;
+            padding: 14px 18px;
+            background: #0f0f0f;
+            border: 2px solid #2a2a2a;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-family: 'Proxima Nova', sans-serif;
+            transition: border-color 0.3s ease;
+        }
+        
+        .auth-input:focus {
+            outline: none;
+            border-color: #e81c5a;
+        }
+        
+        .auth-button {
+            padding: 14px 32px;
+            background: #e81c5a;
             border: none;
-            border-radius: 12px;
-            color: var(--text-secondary);
+            border-radius: 8px;
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
+            transition: all 0.3s ease;
+            margin-top: 8px;
         }
-
-        .nav-button:hover,
-        .nav-button.active {
-            background: rgba(233, 30, 99, 0.1);
-            color: var(--primary);
+        
+        .auth-button:hover {
+            background: #ff4569;
         }
-
-        .nav-button.active::before {
-            content: '';
-            position: absolute;
-            left: -12px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 4px;
-            height: 24px;
-            background: var(--gradient-primary);
-            border-radius: 2px;
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            display: flex;
+        
+        /* Экран настройки */
+        .setup-screen {
+            display: none;
             flex-direction: column;
-            overflow: hidden;
-        }
-
-        /* Header */
-        .launcher-header {
-            padding: 24px 32px;
-            background: rgba(21, 21, 32, 0.8);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
             align-items: center;
-            justify-content: space-between;
+            padding: 40px;
+            flex: 1;
+            overflow-y: auto;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-out forwards;
         }
-
-        .header-title {
-            font-size: 24px;
-            font-weight: 800;
+        
+        .setup-screen.active {
+            display: flex;
         }
-
-        .online-badge {
+        
+        .setup-container {
+            width: 100%;
+            max-width: 600px;
+            margin-top: 40px;
+        }
+        
+        .setup-item {
+            margin-bottom: 28px;
+        }
+        
+        .setup-label {
+            display: block;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .setup-input,
+        .setup-select {
+            width: 100%;
+            padding: 14px 18px;
+            background: #1a1a1a;
+            border: 2px solid #2a2a2a;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-family: 'Proxima Nova', sans-serif;
+            transition: border-color 0.3s ease;
+        }
+        
+        .setup-input:focus,
+        .setup-select:focus {
+            outline: none;
+            border-color: #e81c5a;
+        }
+        
+        .path-input-container {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .path-input-container .setup-input {
+            flex: 1;
+        }
+        
+        .browse-button {
+            padding: 14px 24px;
+            background: #2A2A3E;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .browse-button:hover {
+            background: #3A3A4E;
+        }
+        
+        .setup-hint {
+            color: #B8B8D0;
+            font-size: 12px;
+            margin-top: 6px;
+        }
+        
+        .setup-checkbox {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 12px 20px;
-            background: var(--bg-card);
-            border-radius: var(--radius-md);
-            font-weight: 600;
-        }
-
-        .pulse {
-            width: 8px;
-            height: 8px;
-            background: #4CAF50;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; transform: scale(1.2); }
-        }
-
-        /* Content Area */
-        .content-area {
-            flex: 1;
-            padding: 32px;
-            overflow-y: auto;
-        }
-
-        .section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 24px;
-        }
-
-        .section-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text-secondary);
-        }
-
-        .badge {
-            padding: 6px 12px;
-            background: rgba(233, 30, 99, 0.1);
-            color: var(--primary);
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        /* Server Grid */
-        .servers-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-            gap: 24px;
-            margin-bottom: 32px;
-        }
-
-        .server-card {
-            background: var(--bg-card);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s;
+            color: white;
+            font-size: 14px;
             cursor: pointer;
-            position: relative;
-            overflow: hidden;
         }
-
-        .server-card::before {
+        
+        .setup-checkbox input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #e81c5a;
+        }
+        
+        .setup-button {
+            width: 100%;
+            padding: 16px 32px;
+            background: #e81c5a;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .setup-button:hover {
+            background: #ff4569;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Модальное окно подробностей */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 10px;
+            max-width: 1000px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(233, 30, 99, 0.3);
+            animation: slideUp 0.3s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-content::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             height: 3px;
-            background: var(--gradient-primary);
+            background: #e91e63;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-header {
+            padding: 22px 24px 18px 24px;
+            border-bottom: 1px solid #444;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            background: #444;
+            border: none;
+            border-radius: 6px;
+            color: #999;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        
+        .modal-close:hover {
+            background: #e91e63;
+            color: white;
+        }
+        
+        .modal-body {
+            padding: 24px;
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+        
+        .modal-left-column {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .modal-video {
+            width: 100%;
+            aspect-ratio: 16/9;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            background: #0A0A0F;
+            border: 2px solid rgba(233, 30, 99, 0.2);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+        
+        .video-preview {
+            width: 100%;
+            aspect-ratio: 16/9;
+            border-radius: 8px;
+            margin-bottom: 0;
+            background: #1e1e1e;
+            border: 1px solid #444;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+        
+        .video-preview:hover {
+            border-color: #e91e63;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), 0 0 0 2px rgba(233, 30, 99, 0.3);
+        }
+        
+        .video-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+            opacity: 0.9;
+        }
+        
+        .play-button svg {
+            width: 60px;
+            height: 60px;
+        }
+        
+        .video-preview:hover .play-button {
+            transform: translate(-50%, -50%) scale(1.15);
+            opacity: 1;
+        }
+        
+        .play-button circle {
+            fill: #e91e63;
+        }
+        
+        .video-overlay-text {
+            position: absolute;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #e91e63;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 11px;
+            color: white;
+            opacity: 0;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(233, 30, 99, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .video-preview:hover .video-overlay-text {
+            opacity: 1;
+            bottom: 20px;
+        }
+        
+        .modal-section {
+            margin-bottom: 0;
+        }
+        
+        .modal-section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 14px;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .feature-item {
+            padding: 8px 12px;
+            background: #1e1e1e;
+            border: 1px solid #444;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            color: #ccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .feature-item:hover {
+            background: #333;
+            border-color: #e91e63;
+        }
+        
+        .feature-item::before {
+            content: '✓';
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            background: #e91e63;
+            border-radius: 3px;
+            color: white;
+            font-weight: 700;
+            font-size: 11px;
+            flex-shrink: 0;
+        }
+        
+        .modal-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
+        }
+        
+        .btn-primary {
+            width: 100%;
+            padding: 12px 24px;
+            background: #e91e63;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(233, 30, 99, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-primary:hover {
+            background: #f73378;
+            box-shadow: 0 4px 12px rgba(233, 30, 99, 0.6);
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            width: 100%;
+            padding: 12px 24px;
+            background: #444;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-secondary:hover {
+            background: #555;
+            transform: translateY(-1px);
+        }
+        
+        /* Основной интерфейс */
+        .main-content {
+            flex: 1;
+            display: none;
+            flex-direction: row;
+            overflow: hidden;
+        }
+        
+        .main-content.active {
+            display: flex;
+        }
+        
+        /* Боковое меню слева */
+        .sidebar-left {
+            width: 220px;
+            background: #2a2a2a;
+            border-right: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+        }
+        
+        .sidebar-logo {
+            padding: 24px 20px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .logo-text {
+            font-size: 26px;
+            font-weight: 800;
+            font-style: italic;
+            color: #ffffff;
+            position: relative;
+            display: inline-block;
+            letter-spacing: 0.5px;
+        }
+        
+        
+        .sidebar-nav {
+            flex: 1;
+            padding: 12px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 20px;
+            background: transparent;
+            border: none;
+            border-left: 4px solid transparent;
+            color: #999;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+        
+        .sidebar-item svg {
+            width: 22px;
+            height: 22px;
+            flex-shrink: 0;
+            opacity: 0.8;
+        }
+        
+        .sidebar-item:hover {
+            background: #333;
+            color: #e0e0e0;
+        }
+        
+        .sidebar-item.active {
+            background: #333;
+            border-left-color: #e91e63;
+            color: white;
+        }
+        
+        .sidebar-item.active svg {
+            opacity: 1;
+        }
+        
+        .sidebar-footer {
+            padding: 16px 20px;
+            border-top: 1px solid #333;
+        }
+        
+        .user-profile-sidebar {
+            cursor: pointer;
+        }
+        
+        .user-avatar-small {
+            width: 40px;
+            height: 40px;
+            background: #e81c5a;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .user-avatar-small:hover {
+            transform: scale(1.1);
+        }
+        
+        .user-avatar-small svg {
+            width: 24px;
+            height: 24px;
+        }
+        
+        /* Основная обертка справа */
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Фильтры */
+        .filters-bar {
+            padding: 20px 32px;
+            background: #1a1a1a;
+            border-bottom: 1px solid #2a2a2a;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            color: #B8B8D0;
+            pointer-events: none;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 12px 14px 12px 44px;
+            background: #2a2a2a;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-family: 'Proxima Nova', sans-serif;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            background: #3a3a3a;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(255, 23, 68, 0.2);
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 8px 16px;
+            background: #2a2a2a;
+            border: none;
+            border-radius: 8px;
+            color: #B8B8D0;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .filter-btn:hover {
+            background: #3a3a3a;
+            color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .filter-btn.active {
+            background: #e81c5a;
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 23, 68, 0.4);
+        }
+        
+        .content-area {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        
+        /* Левая часть со списком */
+        .redux-list-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0;
+        }
+        
+        /* Правое изображение */
+        .hero-image {
+            width: 480px;
+            background: #1e1e1e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            border-left: 1px solid #333;
+        }
+        
+        .hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.9;
+        }
+        
+        /* Розовый блок со статистикой */
+        .stats-banner {
+            background: linear-gradient(135deg, #e91e63 0%, #d81558 100%);
+            padding: 18px 32px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            color: white;
+            font-weight: 700;
+            font-size: 15px;
+            box-shadow: 0 2px 8px rgba(233, 30, 99, 0.4);
+        }
+        
+        .stats-icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .stats-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        /* Секции редуксов */
+        .redux-section {
+            padding: 20px 28px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .section-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #e91e63;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .section-title svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        /* Список редуксов */
+        .redux-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        /* Карточка редукса в списке */
+        .redux-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: #333;
+            border: 1px solid #444;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .redux-item:hover {
+            background: #3a3a3a;
+            border-color: #e91e63;
+            transform: translateX(2px);
+            box-shadow: -3px 0 0 0 #e91e63;
+        }
+        
+        /* Иконка редукса */
+        .redux-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #e91e63 0%, #d81558 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(233, 30, 99, 0.3);
+        }
+        
+        /* Информация о редуксе */
+        .redux-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .redux-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 2px;
+        }
+        
+        .redux-category-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            background: rgba(233, 30, 99, 0.2);
+            color: #e91e63;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            border-radius: 3px;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Кнопки действий */
+        .redux-actions {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        
+        .btn-action {
+            padding: 9px 20px;
+            background: #e91e63;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            letter-spacing: 0.8px;
+            box-shadow: 0 2px 6px rgba(233, 30, 99, 0.3);
+        }
+        
+        .btn-action:hover {
+            background: #f73378;
+            box-shadow: 0 4px 12px rgba(233, 30, 99, 0.5);
+            transform: translateY(-1px);
+        }
+        
+        .btn-action.secondary {
+            background: #444;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-action.secondary:hover {
+            background: #555;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
+        
+        .btn-action.danger {
+            background: #555;
+        }
+        
+        .btn-action.danger:hover {
+            background: #666;
+        }
+        
+        .redux-card {
+            background: #1a1a1a;
+            border: none;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            z-index: 2;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .redux-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #e81c5a;
             transform: scaleX(0);
-            transition: transform 0.3s;
+            transition: transform 0.3s ease;
         }
-
-        .server-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--primary);
-            box-shadow: var(--shadow-glow);
+        
+        .redux-card:hover {
+            background: #2a2a2a;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 23, 68, 0.2);
         }
-
-        .server-card:hover::before {
+        
+        .redux-card:hover::before {
             transform: scaleX(1);
         }
-
-        .server-card.recommended {
-            border-color: var(--primary);
+        
+        .redux-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 14px;
         }
-
-        .server-badge {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            background: var(--gradient-primary);
-            padding: 4px 12px;
+        
+        .redux-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 4px;
+        }
+        
+        .redux-category {
+            padding: 4px 10px;
+            background: rgba(255, 23, 68, 0.2);
+            color: #e81c5a;
             border-radius: 6px;
             font-size: 10px;
             font-weight: 700;
             text-transform: uppercase;
         }
-
-        .server-header {
-            display: flex;
-            align-items: center;
-            gap: 16px;
+        
+        .redux-card p {
+            color: #B8B8D0;
+            font-size: 13px;
+            line-height: 1.6;
             margin-bottom: 16px;
+            min-height: 60px;
         }
-
-        .server-icon {
-            width: 56px;
-            height: 56px;
-            background: var(--gradient-primary);
-            border-radius: 12px;
+        
+        .redux-footer {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            flex-shrink: 0;
+            padding-top: 16px;
+            border-top: 1px solid #2a2a2a;
         }
-
-        .server-info {
-            flex: 1;
-        }
-
-        .server-name {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .server-players {
+        
+        .redux-status {
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        .status-online {
-            width: 6px;
-            height: 6px;
-            background: #4CAF50;
-            border-radius: 50%;
-        }
-
-        .player-count {
-            color: var(--primary);
-            font-weight: 700;
-        }
-
-        .server-description {
-            color: var(--text-secondary);
-            font-size: 14px;
-            line-height: 1.5;
-            margin-bottom: 16px;
-        }
-
-        .server-tags {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 16px;
-        }
-
-        .tag {
-            padding: 4px 12px;
-            background: rgba(233, 30, 99, 0.1);
-            color: var(--primary);
-            border-radius: 6px;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 600;
         }
-
-        .server-actions {
-            display: flex;
-            gap: 12px;
+        
+        .redux-status.installed {
+            color: #4CAF50;
         }
-
-        .btn-play {
-            flex: 1;
-            padding: 12px;
-            background: var(--gradient-primary);
+        
+        .redux-status.not-installed {
+            color: #B8B8D0;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+        
+        .redux-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-install {
+            padding: 8px 18px;
+            background: #e81c5a;
             border: none;
-            border-radius: var(--radius-md);
+            border-radius: 8px;
             color: white;
+            font-size: 12px;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(255, 23, 68, 0.3);
+        }
+        
+        .btn-install:hover {
+            background: #ff4569;
+            box-shadow: 0 6px 16px rgba(255, 23, 68, 0.5);
+        }
+        
+        .btn-favorite {
+            width: 34px;
+            height: 34px;
+            background: #2a2a2a;
+            border: none;
+            border-radius: 8px;
+            color: #B8B8D0;
+            cursor: pointer;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
         }
-
-        .btn-play:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-glow);
+        
+        .btn-favorite:hover {
+            background: #3a3a3a;
+            color: #e81c5a;
         }
-
-        .btn-settings {
-            width: 48px;
-            height: 48px;
-            background: var(--bg-secondary);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: var(--radius-md);
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.3s;
+        
+        .btn-favorite.active {
+            background: rgba(255, 23, 68, 0.2);
+            color: #e81c5a;
         }
-
-        .btn-settings:hover {
-            border-color: var(--primary);
-            color: var(--primary);
+        
+        .btn-favorite svg {
+            width: 16px;
+            height: 16px;
         }
-
-        /* Status Panel */
-        .status-panel {
-            background: var(--bg-card);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .status-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-        }
-
-        .status-item {
-            text-align: center;
-        }
-
-        .status-value {
-            font-size: 28px;
-            font-weight: 800;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 8px;
-        }
-
-        .status-label {
-            font-size: 12px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--bg-secondary);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--gradient-primary);
-            border-radius: 4px;
+        
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
 <body>
-    <div class="launcher-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-logo">R</div>
+    <div class="title-bar">
+        <div class="title-bar-title">REDUXION LAUNCHER</div>
+        <div class="title-bar-controls">
+            <button class="title-bar-button minimize" onclick="minimizeWindow()">
+                <svg width="12" height="2" viewBox="0 0 12 2" fill="none">
+                    <rect width="12" height="2" fill="currentColor"/>
+                </svg>
+            </button>
+            <button class="title-bar-button close" onclick="closeWindow()">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Экран загрузки -->
+    <div class="loading-screen" id="loading-screen">
+        <h1 class="logo">Reduxion Launcher</h1>
+        <p class="subtitle">Менеджер модификаций для Majestic RP</p>
+                    <div class="loading-container">
+                <div class="loading-spinner">
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                </div>
+                <div class="loading-text" id="loading-text">Загрузка...</div>
+            </div>
+    </div>
+    
+    <!-- Экран приветствия -->
+    <div class="welcome-screen" id="welcome-screen">
+        <h1 class="logo">Добро пожаловать!</h1>
+        <p class="subtitle">Войдите в свою учетную запись Reduxion</p>
+        
+        <div class="auth-container">
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="switchAuthTab('login')">Вход</button>
+                <button class="auth-tab" onclick="switchAuthTab('register')">Регистрация</button>
+            </div>
+            
+            <div class="auth-form" id="login-form">
+                <input type="text" class="auth-input" placeholder="Email или логин" id="login-email">
+                <input type="password" class="auth-input" placeholder="Пароль" id="login-password">
+                <button class="auth-button" onclick="handleLogin()">Войти</button>
+            </div>
+            
+            <div class="auth-form hidden" id="register-form">
+                <input type="text" class="auth-input" placeholder="Логин" id="register-username">
+                <input type="email" class="auth-input" placeholder="Email" id="register-email">
+                <input type="password" class="auth-input" placeholder="Пароль" id="register-password">
+                <input type="password" class="auth-input" placeholder="Повторите пароль" id="register-password2">
+                <button class="auth-button" onclick="handleRegister()">Зарегистрироваться</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Экран настройки -->
+    <div class="setup-screen" id="setup-screen">
+        <h1 class="logo">Настройка приложения</h1>
+        <p class="subtitle">Укажите необходимые параметры для работы</p>
+        
+        <div class="setup-container">
+            <div class="setup-item">
+                <label class="setup-label">Путь к GTA 5</label>
+                <div class="path-input-container">
+                    <input type="text" class="setup-input" id="gta-path" placeholder="C:\Program Files\Grand Theft Auto V" readonly>
+                    <button class="browse-button" onclick="browseGtaPath()">Обзор</button>
+                </div>
+                <p class="setup-hint">Выберите папку с установленной GTA 5</p>
+            </div>
+            
+            <div class="setup-item">
+                <label class="setup-label">Язык интерфейса</label>
+                <select class="setup-select" id="language">
+                    <option value="ru">Русский</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+            
+            <div class="setup-item">
+                <label class="setup-checkbox">
+                    <input type="checkbox" id="auto-install" checked>
+                    <span>Автоматическая установка обновлений</span>
+                </label>
+            </div>
+            
+            <div class="setup-item">
+                <label class="setup-checkbox">
+                    <input type="checkbox" id="desktop-shortcut">
+                    <span>Создать ярлык на рабочем столе</span>
+                </label>
+            </div>
+            
+            <button class="setup-button" onclick="completeSetup()">Завершить настройку</button>
+        </div>
+    </div>
+    
+    <!-- Основной интерфейс -->
+    <div class="main-content" id="main-content">
+        <!-- Боковое меню слева -->
+        <aside class="sidebar-left">
+            <div class="sidebar-logo">
+                <span class="logo-text">Reduxion</span>
+            </div>
             
             <nav class="sidebar-nav">
-                <button class="nav-button active" title="Серверы">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="2" y="3" width="20" height="6" rx="2"/>
-                        <rect x="2" y="15" width="20" height="6" rx="2"/>
-                        <circle cx="6" cy="6" r="1" fill="currentColor"/>
-                        <circle cx="6" cy="18" r="1" fill="currentColor"/>
+                <button class="sidebar-item active" data-tab="reduxes">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <rect x="3" y="3" width="7" height="7"/>
+                        <rect x="14" y="3" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/>
+                        <rect x="3" y="14" width="7" height="7"/>
                     </svg>
+                    <span>Редуксы</span>
                 </button>
-
-                <button class="nav-button" title="Библиотека">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                <button class="sidebar-item" data-tab="installed">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M9 11l3 3L22 4"/>
+                        <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
                     </svg>
+                    <span>Установленные</span>
                 </button>
-
-                <button class="nav-button" title="Сообщество">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                        <circle cx="9" cy="7" r="4"/>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                <button class="sidebar-item" data-tab="favorites">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                     </svg>
+                    <span>Избранное</span>
                 </button>
-
-                <button class="nav-button" title="Загрузки">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="7 10 12 15 17 10"/>
-                        <line x1="12" y1="15" x2="12" y2="3"/>
+                <button class="sidebar-item" data-tab="settings">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"/>
                     </svg>
+                    <span>Настройки</span>
                 </button>
             </nav>
 
-            <button class="nav-button" title="Настройки">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="3"/>
-                    <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"/>
-                </svg>
-            </button>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Header -->
-            <header class="launcher-header">
-                <h1 class="header-title">
-                    <span style="background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Reduxion</span> Launcher
-                </h1>
-                
-                <div class="online-badge">
-                    <span class="pulse"></span>
-                    <span>Сейчас играют: <strong style="color: var(--primary);">9,403</strong></span>
-                </div>
-            </header>
-
-            <!-- Content -->
-            <div class="content-area">
-                <!-- Recommended Section -->
-                <div class="section-header">
-                    <h2 class="section-title">💎 СОВЕТУЕМ ДЛЯ НОВИЧКОВ</h2>
-                    <span class="badge">ПОПУЛЯРНОЕ</span>
-                </div>
-
-                <div class="servers-grid">
-                    <div class="server-card recommended">
-                        <div class="server-badge">Рекомендуем</div>
-                        
-                        <div class="server-header">
-                            <div class="server-icon">🏙️</div>
-                            <div class="server-info">
-                                <h3 class="server-name">Atlanta</h3>
-                                <div class="server-players">
-                                    <span class="status-online"></span>
-                                    <span><span class="player-count">2,847</span> / 4,000 игроков</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <p class="server-description">
-                            Самый популярный сервер для начинающих с дружелюбным комьюнити и регулярными ивентами.
-                        </p>
-
-                        <div class="server-tags">
-                            <span class="tag">Новичкам</span>
-                            <span class="tag">Активный</span>
-                            <span class="tag">RU</span>
-                        </div>
-
-                        <div class="server-actions">
-                            <button class="btn-play" onclick="playServer('atlanta')">
-                                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M4 2L16 10L4 18V2Z"/>
-                                </svg>
-                                Играть
-                            </button>
-                            <button class="btn-settings">⚙️</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- All Servers -->
-                <div class="section-header">
-                    <h2 class="section-title">🌐 ВСЕ СЕРВЕРЫ</h2>
-                </div>
-
-                <div class="servers-grid">
-                    <div class="server-card">
-                        <div class="server-header">
-                            <div class="server-icon" style="background: linear-gradient(135deg, #FF5722 0%, #E91E63 100%);">🔥</div>
-                            <div class="server-info">
-                                <h3 class="server-name">Phoenix</h3>
-                                <div class="server-players">
-                                    <span class="status-online"></span>
-                                    <span><span class="player-count">1,923</span> / 4,000 игроков</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <p class="server-description">
-                            Сервер для опытных игроков с хардкорным геймплеем и строгими правилами RP.
-                        </p>
-
-                        <div class="server-tags">
-                            <span class="tag">Хардкор</span>
-                            <span class="tag">RP</span>
-                            <span class="tag">RU</span>
-                        </div>
-
-                        <div class="server-actions">
-                            <button class="btn-play" onclick="playServer('phoenix')">
-                                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M4 2L16 10L4 18V2Z"/>
-                                </svg>
-                                Играть
-                            </button>
-                            <button class="btn-settings">⚙️</button>
-                        </div>
-                    </div>
-
-                    <div class="server-card">
-                        <div class="server-header">
-                            <div class="server-icon" style="background: linear-gradient(135deg, #9C27B0 0%, #673AB7 100%);">⭐</div>
-                            <div class="server-info">
-                                <h3 class="server-name">Dallas</h3>
-                                <div class="server-players">
-                                    <span class="status-online"></span>
-                                    <span><span class="player-count">3,156</span> / 4,000 игроков</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <p class="server-description">
-                            Баланс между новичками и профи, идеально подходит для всех уровней игры.
-                        </p>
-
-                        <div class="server-tags">
-                            <span class="tag">Баланс</span>
-                            <span class="tag">Популярный</span>
-                            <span class="tag">RU</span>
-                        </div>
-
-                        <div class="server-actions">
-                            <button class="btn-play" onclick="playServer('dallas')">
-                                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M4 2L16 10L4 18V2Z"/>
-                                </svg>
-                                Играть
-                            </button>
-                            <button class="btn-settings">⚙️</button>
-                        </div>
-                    </div>
-
-                    <div class="server-card">
-                        <div class="server-header">
-                            <div class="server-icon" style="background: linear-gradient(135deg, #FF9800 0%, #FF5722 100%);">🎰</div>
-                            <div class="server-info">
-                                <h3 class="server-name">Las Vegas</h3>
-                                <div class="server-players">
-                                    <span class="status-online"></span>
-                                    <span><span class="player-count">2,477</span> / 4,000 игроков</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <p class="server-description">
-                            Казино, развлечения и большие заработки в городе возможностей.
-                        </p>
-
-                        <div class="server-tags">
-                            <span class="tag">Казино</span>
-                            <span class="tag">Бизнес</span>
-                            <span class="tag">RU</span>
-                        </div>
-
-                        <div class="server-actions">
-                            <button class="btn-play" onclick="playServer('vegas')">
-                                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M4 2L16 10L4 18V2Z"/>
-                                </svg>
-                                Играть
-                            </button>
-                            <button class="btn-settings">⚙️</button>
-                        </div>
-                    </div>
-
-                    <div class="server-card">
-                        <div class="server-header">
-                            <div class="server-icon" style="background: linear-gradient(135deg, #00BCD4 0%, #2196F3 100%);">🏖️</div>
-                            <div class="server-info">
-                                <h3 class="server-name">San Diego</h3>
-                                <div class="server-players">
-                                    <span class="status-online"></span>
-                                    <span><span class="player-count">2,104</span> / 4,000 игроков</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <p class="server-description">
-                            Спокойный сервер у океана с уклоном в легальный бизнес и туризм.
-                        </p>
-
-                        <div class="server-tags">
-                            <span class="tag">Легальный</span>
-                            <span class="tag">Бизнес</span>
-                            <span class="tag">RU</span>
-                        </div>
-
-                        <div class="server-actions">
-                            <button class="btn-play" onclick="playServer('sandiego')">
-                                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M4 2L16 10L4 18V2Z"/>
-                                </svg>
-                                Играть
-                            </button>
-                            <button class="btn-settings">⚙️</button>
-                        </div>
-                    </div>
-
-                    <div class="server-card">
-                        <div class="server-header">
-                            <div class="server-icon" style="background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);">🏛️</div>
-                            <div class="server-info">
-                                <h3 class="server-name">Boston</h3>
-                                <div class="server-players">
-                                    <span class="status-online"></span>
-                                    <span><span class="player-count">1,896</span> / 4,000 игроков</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <p class="server-description">
-                            Исторический сервер с акцентом на политику и общественную деятельность.
-                        </p>
-
-                        <div class="server-tags">
-                            <span class="tag">Политика</span>
-                            <span class="tag">RP</span>
-                            <span class="tag">RU</span>
-                        </div>
-
-                        <div class="server-actions">
-                            <button class="btn-play" onclick="playServer('boston')">
-                                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M4 2L16 10L4 18V2Z"/>
-                                </svg>
-                                Играть
-                            </button>
-                            <button class="btn-settings">⚙️</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Status -->
-                <div class="section-header" style="margin-top: 32px;">
-                    <h2 class="section-title">📊 СТАТИСТИКА</h2>
-                </div>
-
-                <div class="status-panel">
-                    <div class="status-grid">
-                        <div class="status-item">
-                            <div class="status-value">12,403</div>
-                            <div class="status-label">Игроков онлайн</div>
-                        </div>
-                        <div class="status-item">
-                            <div class="status-value">99.9%</div>
-                            <div class="status-label">Uptime серверов</div>
-                        </div>
-                        <div class="status-item">
-                            <div class="status-value">50+</div>
-                            <div class="status-label">Редуксов</div>
-                        </div>
+            <div class="sidebar-footer">
+                <div class="user-profile-sidebar" id="user-profile">
+                    <div class="user-avatar-small">
+                        <svg fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                        </svg>
                     </div>
                 </div>
             </div>
-        </main>
+        </aside>
+
+        <!-- Основной контент справа -->
+        <div class="main-wrapper">
+        
+        <!-- Контент -->
+        <div class="content-area">
+            <!-- Левая часть со списком редуксов -->
+            <div class="redux-list-area">
+                <!-- Розовый блок со статистикой -->
+                <div class="stats-banner">
+                    <div class="stats-icon">
+                        <svg fill="currentColor" viewBox="0 0 24 24">
+                            <rect x="3" y="3" width="7" height="7"/>
+                            <rect x="14" y="3" width="7" height="7"/>
+                            <rect x="14" y="14" width="7" height="7"/>
+                            <rect x="3" y="14" width="7" height="7"/>
+                        </svg>
+                    </div>
+                    <span>Доступно редуксов: <span id="redux-count">0</span></span>
+                </div>
+                
+                <!-- Рекомендуемые -->
+                <div class="redux-section" id="featured-section">
+                    <div class="section-title">
+                        <svg fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                        РЕКОМЕНДУЕМ
+                    </div>
+                    <div class="redux-list" id="featured-list">
+                        <!-- JS заполнит -->
+                    </div>
+                </div>
+                
+                <!-- Все редуксы -->
+                <div class="redux-section" id="all-section">
+                    <div class="section-title">
+                        <svg fill="currentColor" viewBox="0 0 24 24">
+                            <rect x="3" y="3" width="7" height="7"/>
+                            <rect x="14" y="3" width="7" height="7"/>
+                            <rect x="14" y="14" width="7" height="7"/>
+                            <rect x="3" y="14" width="7" height="7"/>
+                        </svg>
+                        ВСЕ РЕДУКСЫ
+                    </div>
+                    <div class="redux-list" id="all-list">
+                        <!-- JS заполнит -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Правое изображение -->
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1516876437184-593fda40c7ce?w=500" alt="Redux Hero">
+            </div>
+        </div>
+        
+        </div>
     </div>
-
+    
+    <!-- Модальное окно подробностей -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-title">Redux Name</h2>
+                <button class="modal-close" onclick="closeModal()">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M2 2L14 14M14 2L2 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Контент добавляется через JS -->
+            </div>
+        </div>
+    </div>
+    
     <script>
-        const { ipcRenderer } = require('electron');
-
-        function playServer(serverName) {
-            console.log('Playing server:', serverName);
-            // Здесь будет логика запуска сервера
-            ipcRenderer.invoke('launch-game', { server: serverName });
-        }
-
-        // Анимация появления карточек
-        document.addEventListener('DOMContentLoaded', () => {
-            const cards = document.querySelectorAll('.server-card');
-            cards.forEach((card, index) => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
-                setTimeout(() => {
-                    card.style.transition = 'all 0.5s ease';
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0)';
-                }, index * 100);
+        if (typeof require !== 'undefined') {
+            const { ipcRenderer } = require('electron');
+            
+            function minimizeWindow() {
+                ipcRenderer.send('window-minimize');
+            }
+            
+            function closeWindow() {
+                ipcRenderer.send('window-close');
+            }
+            
+            // Слушаем событие завершения загрузки
+            ipcRenderer.on('loading-complete', () => {
+                // Проверяем, первый ли это запуск
+                checkFirstRun();
             });
-        });
+            
+            // Обновление текста загрузки
+            ipcRenderer.on('loading-status', (event, status) => {
+                document.getElementById('loading-text').textContent = status;
+            });
+            
+            // Проверка первого запуска
+            function checkFirstRun() {
+                ipcRenderer.send('check-first-run');
+            }
+            
+            // Получаем результат проверки
+            ipcRenderer.on('first-run-status', (event, isFirstRun) => {
+                document.getElementById('loading-screen').classList.add('hidden');
+                
+                if (isFirstRun) {
+                    // Показываем экран приветствия
+                    document.getElementById('welcome-screen').classList.add('active');
+                } else {
+                    // Показываем основной интерфейс
+                    document.getElementById('main-content').classList.add('active');
+                    loadReduxes();
+                }
+            });
+            
+            // Делаем функции глобальными
+            window.switchAuthTab = switchAuthTab;
+            window.handleLogin = handleLogin;
+            window.handleRegister = handleRegister;
+            window.browseGtaPath = browseGtaPath;
+            window.completeSetup = completeSetup;
+            
+            // Переключение вкладок авторизации
+            function switchAuthTab(tab) {
+                const tabs = document.querySelectorAll('.auth-tab');
+                tabs.forEach(t => t.classList.remove('active'));
+                
+                if (tab === 'login') {
+                    tabs[0].classList.add('active');
+                    document.getElementById('login-form').classList.remove('hidden');
+                    document.getElementById('register-form').classList.add('hidden');
+                } else {
+                    tabs[1].classList.add('active');
+                    document.getElementById('login-form').classList.add('hidden');
+                    document.getElementById('register-form').classList.remove('hidden');
+                }
+            }
+            
+            // Обработка входа
+            function handleLogin() {
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                
+                if (!email || !password) {
+                    alert('Заполните все поля!');
+                    return;
+                }
+                
+                // Отправляем данные на сервер (пока просто переходим к настройке)
+                document.getElementById('welcome-screen').classList.remove('active');
+                document.getElementById('setup-screen').classList.add('active');
+            }
+            
+            // Обработка регистрации
+            function handleRegister() {
+                const username = document.getElementById('register-username').value;
+                const email = document.getElementById('register-email').value;
+                const password = document.getElementById('register-password').value;
+                const password2 = document.getElementById('register-password2').value;
+                
+                if (!username || !email || !password || !password2) {
+                    alert('Заполните все поля!');
+                    return;
+                }
+                
+                if (password !== password2) {
+                    alert('Пароли не совпадают!');
+                    return;
+                }
+                
+                // Отправляем данные на сервер (пока просто переходим к настройке)
+                document.getElementById('welcome-screen').classList.remove('active');
+                document.getElementById('setup-screen').classList.add('active');
+            }
+            
+            // Выбор пути к GTA
+            function browseGtaPath() {
+                ipcRenderer.send('browse-gta-path');
+            }
+            
+            // Получаем выбранный путь
+            ipcRenderer.on('gta-path-selected', (event, path) => {
+                document.getElementById('gta-path').value = path;
+            });
+
+            // Обработчики событий загрузки
+            ipcRenderer.on('download-added', (event, data) => {
+                console.log('Загрузка добавлена:', data);
+                // TODO: Обновить UI списка загрузок
+            });
+
+            ipcRenderer.on('download-status-update', (event, data) => {
+                console.log('Статус загрузки:', data);
+                // TODO: Обновить прогресс в UI
+            });
+
+            ipcRenderer.on('download-progress', (event, data) => {
+                console.log('Прогресс:', data.progress + '%');
+                // TODO: Обновить прогресс-бар
+            });
+
+            ipcRenderer.on('download-completed', (event, data) => {
+                console.log('Загрузка завершена:', data);
+                // Обновляем статус редукса
+                const redux = reduxesDatabase.find(r => r.id === data.reduxId);
+                if (redux) {
+                    redux.installed = true;
+                    loadReduxes();
+                }
+                alert(`${data.name} успешно установлен!`);
+            });
+
+            ipcRenderer.on('download-error', (event, data) => {
+                console.error('Ошибка загрузки:', data);
+                alert(`Ошибка загрузки ${data.reduxId}: ${data.error}`);
+            });
+            
+            // Завершение настройки
+            function completeSetup() {
+                const gtaPath = document.getElementById('gta-path').value;
+                const language = document.getElementById('language').value;
+                const autoInstall = document.getElementById('auto-install').checked;
+                const desktopShortcut = document.getElementById('desktop-shortcut').checked;
+                
+                if (!gtaPath) {
+                    alert('Укажите путь к GTA 5!');
+                    return;
+                }
+                
+                // Сохраняем настройки
+                ipcRenderer.send('save-setup', {
+                    gtaPath,
+                    language,
+                    autoInstall,
+                    desktopShortcut
+                });
+                
+                // Переходим к основному интерфейсу
+                document.getElementById('setup-screen').classList.remove('active');
+                document.getElementById('main-content').classList.add('active');
+                loadReduxes();
+            }
+            
+            // База данных редуксов
+            const reduxesDatabase = [
+                {
+                    id: 'panamera-redux',
+                    name: 'Panamera REDUX',
+                    description: 'Полный пакет улучшений интерфейса с кастомными звуками, шрифтами и анимированной картой',
+                    category: 'interface',
+                    installed: false,
+                    featured: true,
+                    videoUrl: 'https://www.youtube.com/embed/9OjQg3GOHCA',
+                    downloadUrl: 'https://github.com/tumbwumba-dot/launcherlaunceherlalalasllasldla/releases/download/v1.0.0/panamera-redux.zip',
+                    features: [
+                        'Залазы',
+                        'Кастом Звуки',
+                        'Кастом Шрифт',
+                        'Вырезаны звуки ДБ',
+                        'Непропадающий прицел (точка и кружок с точкой)',
+                        'Карта Гуччи',
+                        'Миникарта по центру на кнопку',
+                        'Миникарта с анимированным ХП баром'
+                    ]
+                }
+            ];
+
+            let currentFilter = 'all';
+            let searchQuery = '';
+
+            // Загрузка списка редуксов
+            function loadReduxes() {
+                // Обновляем счетчик
+                document.getElementById('redux-count').textContent = reduxesDatabase.length;
+                
+                // Разделяем на рекомендуемые и все остальные
+                const featured = reduxesDatabase.filter(r => r.featured);
+                const all = reduxesDatabase;
+                
+                // Загружаем рекомендуемые
+                const featuredList = document.getElementById('featured-list');
+                featuredList.innerHTML = '';
+                if (featured.length > 0) {
+                    featured.forEach(redux => {
+                        featuredList.appendChild(createReduxItem(redux));
+                    });
+                    document.getElementById('featured-section').style.display = 'block';
+                } else {
+                    document.getElementById('featured-section').style.display = 'none';
+                }
+                
+                // Загружаем все редуксы
+                const allList = document.getElementById('all-list');
+                allList.innerHTML = '';
+                all.forEach(redux => {
+                    allList.appendChild(createReduxItem(redux));
+                });
+            }
+            
+            // Создание элемента редукса в списке
+            function createReduxItem(redux) {
+                const item = document.createElement('div');
+                item.className = 'redux-item';
+                
+                // Иконка категории
+                const icon = getCategoryIcon(redux.category);
+                
+                item.innerHTML = `
+                    <div class="redux-icon">${icon}</div>
+                    <div class="redux-info">
+                        <div class="redux-name">${redux.name}</div>
+                        <span class="redux-category-badge">${getCategoryName(redux.category)}</span>
+                    </div>
+                    <div class="redux-actions">
+                        ${redux.features ? `<button class="btn-action secondary" onclick="showDetails('${redux.id}')">ПОДРОБНЕЕ</button>` : ''}
+                        <button class="btn-action ${redux.installed ? 'danger' : ''}" onclick="installRedux('${redux.id}')">
+                            ${redux.installed ? 'УДАЛИТЬ' : 'УСТАНОВИТЬ'}
+                        </button>
+                    </div>
+                `;
+                
+                return item;
+            }
+            
+            // Иконки категорий
+            function getCategoryIcon(category) {
+                const icons = {
+                    'visuals': '🎨',
+                    'hud': '📊',
+                    'interface': '🖥️',
+                    'gameplay': '🎮',
+                    'sounds': '🔊',
+                    'other': '⚙️'
+                };
+                return icons[category] || '📦';
+            }
+
+            function getCategoryName(category) {
+                const names = {
+                    'visuals': 'Визуал',
+                    'hud': 'HUD',
+                    'interface': 'Интерфейс',
+                    'gameplay': 'Геймплей',
+                    'sounds': 'Звуки',
+                    'other': 'Другое'
+                };
+                return names[category] || category;
+            }
+            
+            // Показать модальное окно с подробностями
+            window.showDetails = function(id) {
+                const redux = reduxesDatabase.find(r => r.id === id);
+                if (!redux) return;
+                
+                document.getElementById('modal-title').textContent = redux.name;
+                
+                let videoHtml = '';
+                if (redux.videoUrl) {
+                    const videoId = redux.videoUrl.split('/').pop().split('?')[0];
+                    const watchUrl = `https://www.youtube.com/watch?v=${videoId}`;
+                    videoHtml = `
+                        <div class="video-preview" onclick="require('electron').shell.openExternal('${watchUrl}')">
+                            <img src="https://img.youtube.com/vi/${videoId}/maxresdefault.jpg" alt="Video Preview">
+                            <div class="play-button">
+                                <svg viewBox="0 0 80 80" fill="none">
+                                    <circle cx="40" cy="40" r="40" fill="#e81c5a"/>
+                                    <path d="M32 26L56 40L32 54V26Z" fill="white"/>
+                                </svg>
+                            </div>
+                            <div class="video-overlay-text">Нажмите, чтобы открыть видео</div>
+                        </div>
+                    `;
+                }
+                
+                // Список фич в одну колонку справа
+                let featuresHtml = '';
+                if (redux.features && redux.features.length > 0) {
+                    featuresHtml = `
+                        <div class="modal-section">
+                            <h3 class="modal-section-title">Что включено:</h3>
+                            <ul class="feature-list">
+                                ${redux.features.map(f => `<li class="feature-item">${f}</li>`).join('')}
+                            </ul>
+                        </div>
+                    `;
+                }
+                
+                document.getElementById('modal-body').innerHTML = `
+                    <div class="modal-left-column">
+                        ${videoHtml}
+                        <div class="modal-actions">
+                            <button class="btn-primary" onclick="installRedux('${redux.id}'); closeModal();">
+                                ${redux.installed ? 'Удалить' : 'Установить'}
+                            </button>
+                            <button class="btn-secondary" onclick="closeModal()">Закрыть</button>
+                        </div>
+                    </div>
+                    ${featuresHtml}
+                `;
+                
+                document.getElementById('modal-overlay').classList.add('active');
+            };
+            
+            // Закрыть модальное окно
+            window.closeModal = function() {
+                document.getElementById('modal-overlay').classList.remove('active');
+            };
+            
+            // Закрытие по клику на overlay
+            document.getElementById('modal-overlay').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+
+            // Установка/удаление редукса
+            window.installRedux = async function(id) {
+                const redux = reduxesDatabase.find(r => r.id === id);
+                if (!redux) return;
+
+                if (redux.installed) {
+                    // Удаление редукса
+                    if (confirm(`Удалить ${redux.name}?`)) {
+                        try {
+                            const result = await ipcRenderer.invoke('uninstall-redux', redux.id);
+                            if (result.success) {
+                                redux.installed = false;
+                                loadReduxes();
+                                alert(`${redux.name} успешно удален!`);
+                            } else {
+                                alert('Ошибка удаления: ' + result.error);
+                            }
+                        } catch (error) {
+                            alert('Ошибка удаления: ' + error.message);
+                        }
+                    }
+                } else {
+                    // Установка редукса
+                    if (!redux.downloadUrl) {
+                        alert('У этого редукса нет ссылки для загрузки');
+                        return;
+                    }
+
+                    try {
+                        const result = await ipcRenderer.invoke('start-redux-download', redux, redux.downloadUrl);
+                        if (result.success) {
+                            // Перейти на вкладку "Загрузки"
+                            showView('downloads-view');
+                        }
+                    } catch (error) {
+                        alert('Ошибка загрузки: ' + error.message);
+                    }
+                }
+            };
+
+            // Добавление/удаление из избранного
+            window.toggleFavorite = function(id) {
+                const redux = reduxesDatabase.find(r => r.id === id);
+                if (redux) {
+                    redux.favorite = !redux.favorite;
+                    loadReduxes();
+                }
+            };
+
+            // Фильтрация
+            document.addEventListener('DOMContentLoaded', () => {
+                // Обработчики фильтров
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        currentFilter = btn.dataset.filter;
+                        loadReduxes();
+                    });
+                });
+
+                // Обработчик поиска
+                const searchInput = document.getElementById('search-input');
+                if (searchInput) {
+                    searchInput.addEventListener('input', (e) => {
+                        searchQuery = e.target.value;
+                        loadReduxes();
+                    });
+                }
+
+                // Обработчики навигации
+                document.querySelectorAll('.sidebar-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+                        item.classList.add('active');
+                        
+                        const tab = item.dataset.tab;
+                        if (tab === 'installed') {
+                            currentFilter = 'all';
+                            searchQuery = '';
+                            // Показываем только установленные
+                            const grid = document.getElementById('redux-grid');
+                            grid.innerHTML = '';
+                            reduxesDatabase.filter(r => r.installed).forEach(redux => {
+                                const card = document.createElement('div');
+                                card.className = 'redux-card';
+                                card.innerHTML = `
+                                    <div class="redux-header">
+                                        <div><h3>${redux.name}</h3></div>
+                                        <span class="redux-category">${getCategoryName(redux.category)}</span>
+                                    </div>
+                                    <p>${redux.description}</p>
+                                    <div class="redux-footer">
+                                        <div class="redux-status installed">
+                                            <span class="status-dot"></span>
+                                            <span>Установлено</span>
+                                        </div>
+                                        <div class="redux-actions">
+                                            <button class="btn-install" onclick="installRedux(${redux.id})">Удалить</button>
+                                        </div>
+                                    </div>
+                                `;
+                                grid.appendChild(card);
+                            });
+                        } else if (tab === 'favorites') {
+                            currentFilter = 'all';
+                            searchQuery = '';
+                            // Показываем только избранные
+                            const grid = document.getElementById('redux-grid');
+                            grid.innerHTML = '';
+                            reduxesDatabase.filter(r => r.favorite).forEach(redux => {
+                                const card = document.createElement('div');
+                                card.className = 'redux-card';
+                                card.innerHTML = `
+                                    <div class="redux-header">
+                                        <div><h3>${redux.name}</h3></div>
+                                        <span class="redux-category">${getCategoryName(redux.category)}</span>
+                                    </div>
+                                    <p>${redux.description}</p>
+                                    <div class="redux-footer">
+                                        <div class="redux-status ${redux.installed ? 'installed' : 'not-installed'}">
+                                            <span class="status-dot"></span>
+                                            <span>${redux.installed ? 'Установлено' : 'Не установлено'}</span>
+                                        </div>
+                                        <div class="redux-actions">
+                                            <button class="btn-install" onclick="installRedux(${redux.id})">${redux.installed ? 'Удалить' : 'Установить'}</button>
+                                            <button class="btn-favorite active" onclick="toggleFavorite(${redux.id})">
+                                                <svg fill="currentColor" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                `;
+                                grid.appendChild(card);
+                            });
+                        } else if (tab === 'reduxes') {
+                            loadReduxes();
+                        }
+                    });
+                });
+            });
+        }
     </script>
 </body>
 </html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reduxion Installer - Majestic Style</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="installer-majestic.css">
+</head>
+<body>
+    <div class="installer-container">
+        <h1 class="logo">Majestic</h1>
+
+        <h2 class="connection-title">ПОДКЛЮЧЕНИЕ К СЕРВЕРУ</h2>
+        <p class="status-text loading" id="status-text">ПРОВЕРКА КОНТЕНТА</p>
+
+        <div class="progress-bar-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="progress-details" id="progress-details">0 из 0</div>
+        </div>
+
+        <div class="cancel-button-wrapper">
+            <button class="cancel-button" onclick="cancelInstallation()">
+                ✕
+            </button>
+            <div class="cancel-text">Отмена</div>
+        </div>
+    </div>
+
+    <script>
+        if (typeof require !== 'undefined') {
+            const { ipcRenderer } = require('electron');
+
+            document.addEventListener('DOMContentLoaded', () => {
+                ipcRenderer.send('installer-ready');
+            });
+
+            ipcRenderer.on('update-progress', (event, data) => {
+                const { statusText, current, total, details } = data;
+
+                const statusElement = document.getElementById('status-text');
+                const progressFill = document.getElementById('progress-fill');
+                const progressDetails = document.getElementById('progress-details');
+
+                if (statusText) {
+                    statusElement.textContent = statusText;
+                }
+
+                if (current !== undefined && total !== undefined && total > 0) {
+                    const percentage = (current / total) * 100;
+                    progressFill.style.width = `${percentage}%`;
+                    progressDetails.textContent = details || `${current} из ${total}`;
+                } else {
+                    progressDetails.textContent = details || '';
+                }
+            });
+
+            function cancelInstallation() {
+                if (confirm('Вы уверены, что хотите отменить установку?')) {
+                    ipcRenderer.send('cancel-installation');
+                }
+            }
+        } else {
+            // Демо-режим для браузера
+            function cancelInstallation() {
+                if (confirm('Вы уверены, что хотите отменить установку?')) {
+                    console.log('Установка отменена');
+                }
+            }
+
+            // Симуляция прогресса
+            let progress = 0;
+            setInterval(() => {
+                if (progress < 100) {
+                    progress += Math.random() * 5;
+                    if (progress > 100) progress = 100;
+                    document.getElementById('progress-fill').style.width = `${progress}%`;
+                    document.getElementById('progress-details').textContent = `${Math.floor(progress)} из 100`;
+                }
+            }, 300);
+        }
+    </script>
+</body>
+</html>

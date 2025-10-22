@@ -9,6 +9,7 @@ files:
       - installer-standalone.html
       - installer-standalone-main.js
       - package.json
+      - fonts/**/*
 asar: true
 asarUnpack: []
 extraMetadata:
@@ -18,7 +19,7 @@ win:
     - target: portable
       arch:
         - x64
-  icon: assets/icon.ico
+  icon: build/icon.png
   artifactName: ReduxionLauncherInstaller.exe
 portable:
   artifactName: ReduxionLauncherInstaller.exe

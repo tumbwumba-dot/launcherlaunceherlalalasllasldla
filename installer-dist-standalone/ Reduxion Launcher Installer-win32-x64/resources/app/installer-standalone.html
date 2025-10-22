@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reduxion Installer - Majestic Style</title>
+    <style>
+        @font-face {
+            font-family: 'Proxima Nova';
+            src: url('reduxion-launcher/fonts/ProximaNova-Regular.woff2') format('woff2');
+            font-weight: 400;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Proxima Nova';
+            src: url('reduxion-launcher/fonts/ProximaNova-Semibold.woff2') format('woff2');
+            font-weight: 600;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Proxima Nova';
+            src: url('reduxion-launcher/fonts/ProximaNova-Bold.woff2') format('woff2');
+            font-weight: 700;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Proxima Nova';
+            src: url('reduxion-launcher/fonts/ProximaNova-Extrabld.woff2') format('woff2');
+            font-weight: 800;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Proxima Nova';
+            src: url('reduxion-launcher/fonts/ProximaNova-Black.woff2') format('woff2');
+            font-weight: 900;
+            font-style: normal;
+        }
+
+        :root {
+            --primary-bg: #0f0f0f;
+            --accent-color: #ff1744;
+            --accent-dark: #ff4569;
+            --text-primary: #FFFFFF;
+            --text-secondary: #B8B8D0;
+            --font-main: 'Proxima Nova', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .installer-container {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            width: 100%;
+            max-width: 700px;
+            padding: 40px;
+        }
+
+        .logo {
+            font-size: 48px;
+            font-weight: 900;
+            font-style: italic;
+            color: var(--text-primary);
+            margin-bottom: 80px;
+            letter-spacing: 2px;
+        }
+
+        .connection-title {
+            font-size: 40px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .status-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            margin-bottom: 12px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background-color: #1a1a1a;
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: var(--accent-color);
+            border-radius: 3px;
+            transition: width 0.4s ease-out;
+            box-shadow: 0 0 20px rgba(255, 23, 68, 0.6);
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .progress-details {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 12px;
+            font-weight: 600;
+        }
+
+        .cancel-button-wrapper {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            z-index: 10;
+        }
+
+        .cancel-button {
+            background: #2a2a2a;
+            border: none;
+            color: var(--text-secondary);
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: var(--font-main);
+            gap: 8px;
+        }
+
+        .cancel-button:hover {
+            background: var(--accent-color);
+            color: var(--text-primary);
+        }
+
+        .cancel-button:active {
+            background: var(--accent-dark);
+        }
+
+        /* Анимация появления */
+        .installer-container > * {
+            animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        .logo {
+            animation-delay: 0s;
+        }
+
+        .connection-title {
+            animation-delay: 0.1s;
+        }
+
+        .status-text {
+            animation-delay: 0.2s;
+        }
+
+        .progress-bar-container {
+            animation-delay: 0.3s;
+        }
+
+        .cancel-button-wrapper {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Пульсация для loading */
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .status-text.loading {
+            animation: pulse 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="installer-container">
+        <h1 class="logo">Reduxion Launcher</h1>
+
+        <h2 class="connection-title">УСТАНОВКА</h2>
+        <p class="status-text loading" id="status-text">ПОДГОТОВКА К УСТАНОВКЕ</p>
+
+        <div class="progress-bar-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="progress-details" id="progress-details">0 из 5</div>
+        </div>
+    </div>
+
+    <div class="cancel-button-wrapper">
+            <button class="cancel-button" onclick="cancelInstallation()">
+                <span>✕</span>
+                <span>Отмена</span>
+            </button>
+    </div>
+
+    <script>
+        if (typeof require !== 'undefined') {
+            const { ipcRenderer } = require('electron');
+
+            document.addEventListener('DOMContentLoaded', () => {
+                ipcRenderer.send('installer-ready');
+            });
+
+            ipcRenderer.on('update-progress', (event, data) => {
+                const { statusText, current, total, details } = data;
+
+                const statusElement = document.getElementById('status-text');
+                const progressFill = document.getElementById('progress-fill');
+                const progressDetails = document.getElementById('progress-details');
+
+                if (statusText) {
+                    statusElement.textContent = statusText;
+                }
+
+                if (current !== undefined && total !== undefined && total > 0) {
+                    const percentage = (current / total) * 100;
+                    progressFill.style.width = `${percentage}%`;
+                    progressDetails.textContent = details || `${current} из ${total}`;
+                } else {
+                    progressDetails.textContent = details || '';
+                }
+            });
+
+            ipcRenderer.on('installation-complete', () => {
+                document.getElementById('status-text').textContent = 'УСТАНОВКА ЗАВЕРШЕНА';
+                document.getElementById('status-text').classList.remove('loading');
+                document.getElementById('progress-fill').style.width = '100%';
+                document.getElementById('progress-details').textContent = 'Запуск лаунчера...';
+                
+                // Скрываем кнопку отмены
+                const cancelBtn = document.querySelector('.cancel-button-wrapper');
+                if (cancelBtn) {
+                    cancelBtn.style.display = 'none';
+                }
+                
+                // Автоматически запускаем через 2 секунды
+                setTimeout(() => {
+                    ipcRenderer.send('launch-app');
+                }, 2000);
+            });
+
+            ipcRenderer.on('installation-cancelled', () => {
+                document.getElementById('status-text').textContent = 'УСТАНОВКА ОТМЕНЕНА';
+                document.getElementById('status-text').classList.remove('loading');
+                document.getElementById('progress-fill').style.width = '0%';
+                document.getElementById('progress-details').textContent = 'Отменено';
+                
+                setTimeout(() => {
+                    ipcRenderer.send('close-installer');
+                }, 2000);
+            });
+
+            function cancelInstallation() {
+                ipcRenderer.send('cancel-installation');
+            }
+        } else {
+            // Демо-режим для браузера
+            function cancelInstallation() {
+                console.log('Установка отменена');
+                document.getElementById('status-text').textContent = 'УСТАНОВКА ОТМЕНЕНА';
+                document.getElementById('status-text').classList.remove('loading');
+            }
+
+            // Симуляция прогресса
+            let progress = 0;
+            setInterval(() => {
+                if (progress < 100) {
+                    progress += Math.random() * 5;
+                    if (progress > 100) progress = 100;
+                    document.getElementById('progress-fill').style.width = `${progress}%`;
+                    document.getElementById('progress-details').textContent = `${Math.floor(progress)} из 100`;
+                }
+            }, 300);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+appId: com.reduxion.bootstrap-installer
+productName: Reduxion Bootstrap Installer
+copyright: Copyright © 2025 Reduxion Team
+
+directories:
+  output: bootstrap-dist
+  buildResources: assets
+
+# Включаем только необходимые файлы для bootstrap
+files:
+  - bootstrap-installer-main.js
+  - bootstrap-installer.html
+  - package.json
+  - assets/**
+  - "!**/*.md"
+  - "!dist/**"
+  - "!test-dist/**"
+  - "!installer-dist/**"
+  - "!launcher-dist/**"
+  - "!temp-installer/**"
+  - "!SFX-Installer/**"
+  - "!Ready-to-Upload/**"
+  - "!build/**"
+  - "!*.bat"
+  - "!*.log"
+  - "!main.js"
+  - "!installer-main.js"
+  - "!launcher.html"
+  - "!modern-launcher.html"
+
+win:
+  target:
+    - target: portable
+      arch:
+        - x64
+  artifactName: Reduxion-Bootstrap-${version}.${ext}
+  # Полностью отключаем подписывание
+  sign: null
+  signingHashAlgorithms: []
+
+portable:
+  # Имя исполняемого файла
+  artifactName: Reduxion-Bootstrap-Installer.exe
+
+compression: maximum
+
+# Настройки асара для уменьшения размера
+asar: true
+asarUnpack:
+  - "**/*.node"
+
+publish: null

@@ -1,0 +1,32 @@
+{
+  "appId": "com.reduxion.launcher.installer",
+  "productName": "Reduxion Launcher Setup",
+  "directories": {
+    "output": "installer-dist"
+  },
+  "files": [
+    "installer.html",
+    "installer-styles.css",
+    "installer-main.js",
+    "downloader.js",
+    "assets/**/*",
+    "!node_modules/**/*",
+    "!dist/**/*",
+    "!build/**/*",
+    "!*.md"
+  ],
+  "win": {
+    "target": "nsis",
+    "icon": "assets/icon.ico"
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "installerIcon": "assets/icon.ico",
+    "uninstallerIcon": "assets/icon.ico",
+    "installerHeaderIcon": "assets/icon.ico",
+    "createDesktopShortcut": false,
+    "createStartMenuShortcut": false,
+    "shortcutName": "Reduxion Launcher Setup"
+  }
+}

@@ -6,23 +6,26 @@ directories:
   output: launcher-dist
   buildResources: assets
 
+files:
+  - modern-launcher.html
+  - main.js
+  - download-manager.js
+  - package.json
+  - fonts/**/*
+  - node_modules/**/*
+
+asar: true
+
+extraMetadata:
+  main: main.js
+
 win:
   target:
-    - target: dir
+    - target: portable
       arch:
         - x64
-  icon: assets/icon.ico
+  icon: build/icon.png
+  artifactName: ReduxionLauncher.exe
 
-nsis:
-  oneClick: false
-  perMachine: false
-  allowElevation: true
-  allowToChangeInstallationDirectory: true
-  installerIcon: assets/icon.ico
-  uninstallerIcon: assets/icon.ico
-  installerHeaderIcon: assets/icon.ico
-  createDesktopShortcut: true
-  createStartMenuShortcut: true
-  shortcutName: Reduxion Launcher
-  displayLanguageSelector: false
-  language: 1049
+portable:
+  artifactName: ReduxionLauncher.exe

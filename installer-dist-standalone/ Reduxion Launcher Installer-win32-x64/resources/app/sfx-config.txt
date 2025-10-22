@@ -1,0 +1,14 @@
+Path=%LOCALAPPDATA%\ReduxionLauncher
+Setup=install.bat
+Silent=0
+Overwrite=1
+Title=Установка Reduxion Launcher
+Text
+{
+Установка Reduxion Launcher
+
+Этот установщик распакует и установит 
+Reduxion Launcher на ваш компьютер.
+
+Нажмите "Install" для продолжения.
+}

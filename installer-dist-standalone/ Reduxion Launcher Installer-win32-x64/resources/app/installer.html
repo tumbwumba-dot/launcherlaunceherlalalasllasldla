@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Установка Reduxion Launcher</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="installer-majestic.css">
+    <style>
+        .step { display: none; }
+        .step.active { display: block; }
+        
+        .license-text {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 20px;
+            height: 300px;
+            overflow-y: auto;
+            margin: 20px 0;
+            font-size: 13px;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .license-text::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .license-text::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+        }
+        
+        .license-text::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #e91e63 0%, #9c27b0 100%);
+            border-radius: 4px;
+        }
+        
+        .license-text::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #f06292 0%, #ba68c8 100%);
+        }
+        
+        .path-selector {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .path-input {
+            flex: 1;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            padding: 12px 16px;
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+        }
+        
+        .browse-btn {
+            background: linear-gradient(135deg, #e91e63 0%, #9c27b0 100%);
+            border: none;
+            border-radius: 6px;
+            padding: 12px 24px;
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .browse-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(233, 30, 99, 0.4);
+        }
+        
+        .options-list {
+            margin: 20px 0;
+        }
+        
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .option-item:hover {
+            background: rgba(255,255,255,0.08);
+        }
+        
+        .option-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .option-item label {
+            cursor: pointer;
+            font-size: 14px;
+            user-select: none;
+        }
+        
+        .buttons-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.15);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #e91e63 0%, #9c27b0 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(233, 30, 99, 0.4);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .step-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #e91e63 0%, #9c27b0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .step-description {
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="installer-container">
+        <h1 class="logo">Reduxion Launcher</h1>
+
+        <!-- Шаг 1: Приветствие -->
+        <div id="step-welcome" class="step active">
+            <h2 class="step-title">Добро пожаловать в установщик Reduxion Launcher</h2>
+            <p class="step-description">Эта программа установит Reduxion Launcher на ваш компьютер</p>
+            <div class="buttons-container">
+                <button class="btn btn-secondary" onclick="cancelInstallation()">Отмена</button>
+                <button class="btn btn-primary" onclick="nextStep()">Далее</button>
+            </div>
+        </div>
+
+        <!-- Шаг 2: Лицензионное соглашение -->
+        <div id="step-license" class="step">
+            <h2 class="step-title">Лицензионное соглашение</h2>
+            <p class="step-description">Пожалуйста, ознакомьтесь с условиями лицензии</p>
+            <div class="license-text">
+                <h3>ЛИЦЕНЗИОННОЕ СОГЛАШЕНИЕ REDUXION LAUNCHER</h3>
+                <p>Настоящее лицензионное соглашение ("Соглашение") заключается между вами и разработчиками Reduxion Launcher.</p>
+                
+                <h4>1. ПРЕДОСТАВЛЕНИЕ ЛИЦЕНЗИИ</h4>
+                <p>Данное программное обеспечение предоставляется "как есть" для личного некоммерческого использования.</p>
+                
+                <h4>2. ОГРАНИЧЕНИЯ</h4>
+                <p>Вы не имеете права:</p>
+                <ul>
+                    <li>Распространять модифицированные версии программы</li>
+                    <li>Использовать программу в коммерческих целях без разрешения</li>
+                    <li>Производить обратную разработку программного обеспечения</li>
+                </ul>
+                
+                <h4>3. ОТКАЗ ОТ ГАРАНТИЙ</h4>
+                <p>Программное обеспечение предоставляется "как есть", без каких-либо гарантий.</p>
+                
+                <h4>4. ОГРАНИЧЕНИЕ ОТВЕТСТВЕННОСТИ</h4>
+                <p>Разработчики не несут ответственности за любые убытки, возникшие в результате использования программы.</p>
+                
+                <h4>5. КОНФИДЕНЦИАЛЬНОСТЬ</h4>
+                <p>Программа не собирает личные данные пользователей без их согласия.</p>
+            </div>
+            <div class="option-item">
+                <input type="checkbox" id="accept-license" onchange="toggleAcceptButton()">
+                <label for="accept-license">Я принимаю условия лицензионного соглашения</label>
+            </div>
+            <div class="buttons-container">
+                <button class="btn btn-secondary" onclick="prevStep()">Назад</button>
+                <button class="btn btn-primary" id="accept-btn" disabled onclick="nextStep()">Далее</button>
+            </div>
+        </div>
+
+        <!-- Шаг 3: Выбор папки установки -->
+        <div id="step-path" class="step">
+            <h2 class="step-title">Выбор папки установки</h2>
+            <p class="step-description">Выберите папку, в которую будет установлен Reduxion Launcher</p>
+            <div class="path-selector">
+                <input type="text" class="path-input" id="install-path" readonly>
+                <button class="browse-btn" onclick="browsePath()">Обзор...</button>
+            </div>
+            <div class="buttons-container">
+                <button class="btn btn-secondary" onclick="prevStep()">Назад</button>
+                <button class="btn btn-primary" onclick="nextStep()">Далее</button>
+            </div>
+        </div>
+
+        <script>
+            // Устанавливаем путь по умолчанию при загрузке
+            const defaultPath = require('path').join(require('os').homedir(), 'Reduxion Launcher');
+            document.addEventListener('DOMContentLoaded', () => {
+                document.getElementById('install-path').value = defaultPath;
+            });
+        </script>
+
+        <!-- Шаг 4: Дополнительные опции -->
+        <div id="step-options" class="step">
+            <h2 class="step-title">Дополнительные параметры</h2>
+            <p class="step-description">Выберите дополнительные опции установки</p>
+            <div class="options-list">
+                <div class="option-item">
+                    <input type="checkbox" id="desktop-shortcut" checked>
+                    <label for="desktop-shortcut">Создать ярлык на рабочем столе</label>
+                </div>
+                <div class="option-item">
+                    <input type="checkbox" id="startmenu-shortcut" checked>
+                    <label for="startmenu-shortcut">Создать ярлык в меню "Пуск"</label>
+                </div>
+                <div class="option-item">
+                    <input type="checkbox" id="autorun">
+                    <label for="autorun">Запускать вместе с Windows</label>
+                </div>
+            </div>
+            <div class="buttons-container">
+                <button class="btn btn-secondary" onclick="prevStep()">Назад</button>
+                <button class="btn btn-primary" onclick="startInstallation()">Установить</button>
+            </div>
+        </div>
+
+        <!-- Шаг 5: Установка -->
+        <div id="step-installing" class="step">
+            <h2 class="connection-title">УСТАНОВКА</h2>
+            <p class="status-text" id="status-text">ПОДГОТОВКА К УСТАНОВКЕ</p>
+            <div class="progress-bar-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="progress-details" id="progress-details">0%</div>
+            </div>
+        </div>
+
+        <!-- Шаг 6: Завершение -->
+        <div id="step-finish" class="step">
+            <h2 class="step-title">Установка завершена!</h2>
+            <p class="step-description">Reduxion Launcher успешно установлен на ваш компьютер</p>
+            <div class="options-list">
+                <div class="option-item">
+                    <input type="checkbox" id="launch-after-install" checked>
+                    <label for="launch-after-install">Запустить Reduxion Launcher</label>
+                </div>
+            </div>
+            <div class="buttons-container">
+                <button class="btn btn-primary" onclick="finishInstallation()">Завершить</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        let currentStep = 0;
+        const steps = ['welcome', 'license', 'path', 'options', 'installing', 'finish'];
+
+        function showStep(stepIndex) {
+            steps.forEach((step, index) => {
+                const element = document.getElementById(`step-${step}`);
+                if (index === stepIndex) {
+                    element.classList.add('active');
+                } else {
+                    element.classList.remove('active');
+                }
+            });
+            currentStep = stepIndex;
+        }
+
+        function nextStep() {
+            if (currentStep < steps.length - 1) {
+                showStep(currentStep + 1);
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 0) {
+                showStep(currentStep - 1);
+            }
+        }
+
+        function toggleAcceptButton() {
+            const checkbox = document.getElementById('accept-license');
+            const button = document.getElementById('accept-btn');
+            button.disabled = !checkbox.checked;
+        }
+
+        async function browsePath() {
+            const path = await ipcRenderer.invoke('select-install-folder');
+            if (path) {
+                document.getElementById('install-path').value = path;
+            }
+        }
+
+        function startInstallation() {
+            showStep(4); // Переходим к экрану установки
+            ipcRenderer.send('start-installation', {
+                path: document.getElementById('install-path').value,
+                desktopShortcut: document.getElementById('desktop-shortcut').checked,
+                startMenuShortcut: document.getElementById('startmenu-shortcut').checked,
+                autorun: document.getElementById('autorun').checked
+            });
+        }
+
+        function finishInstallation() {
+            const launchAfter = document.getElementById('launch-after-install').checked;
+            ipcRenderer.send('finish-installation', { launchAfter });
+        }
+
+        function cancelInstallation() {
+            if (confirm('Вы уверены, что хотите отменить установку?')) {
+                ipcRenderer.send('cancel-installation');
+            }
+        }
+
+        // Обработчик обновления прогресса
+        ipcRenderer.on('update-progress', (event, data) => {
+            const { statusText, current, total, percentage } = data;
+
+            const statusElement = document.getElementById('status-text');
+            const progressFill = document.getElementById('progress-fill');
+            const progressDetails = document.getElementById('progress-details');
+
+            if (statusText) {
+                statusElement.textContent = statusText;
+            }
+
+            if (percentage !== undefined) {
+                progressFill.style.width = `${percentage}%`;
+                progressDetails.textContent = `${Math.round(percentage)}%`;
+            } else if (current !== undefined && total !== undefined && total > 0) {
+                const percent = (current / total) * 100;
+                progressFill.style.width = `${percent}%`;
+                progressDetails.textContent = `${current} из ${total}`;
+            }
+        });
+
+        // Обработчик завершения установки
+        ipcRenderer.on('installation-complete', () => {
+            showStep(5); // Переходим к экрану завершения
+        });
+    </script>
+</body>
+</html>

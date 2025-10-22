@@ -3,9 +3,16 @@ const path = require('path');
 const fs = require('fs-extra');
 const os = require('os');
 const ps = require('ps-node');
+const https = require('https');
+const { exec } = require('child_process');
+const DownloadManager = require('./download-manager');
 
 // Глобальная переменная для главного окна
 let mainWindow;
+let downloadManager;
+
+// Текущая версия лаунчера
+const CURRENT_VERSION = '1.0.0';
 
 // Путь к настройкам приложения
 const settingsPath = path.join(app.getPath('userData'), 'settings.json');
@@ -54,23 +61,22 @@ function createMainWindow() {
 
      // Создаем окно браузера
      mainWindow = new BrowserWindow({
-       width: isInstaller ? 1000 : 900,
-       height: isInstaller ? 700 : 700,
-       minWidth: 800,
-       minHeight: 600,
+       width: isInstaller ? 1000 : 1400,
+       height: isInstaller ? 700 : 900,
+       center: true,
        webPreferences: {
          nodeIntegration: true,
          contextIsolation: false,
          enableRemoteModule: true,
-         webSecurity: false // Отключаем для локальных файлов
+         webSecurity: false
        },
        icon: path.join(__dirname, 'assets', 'icon.png'),
-       title: isInstaller ? 'Установка Reduxion Launcher' : 'Reduxion Launcher',
+       title: isInstaller ? 'Установка Reduxion Launcher' : 'Majestic Launcher',
        show: false,
-       resizable: true,
+       resizable: false,
        minimizable: true,
-       maximizable: true,
-       frame: true // Включаем рамку для отображения ошибок
+       maximizable: false,
+       frame: false // Без рамки - кастомный тайтл бар
      });
 
      // Загружаем соответствующий HTML файл
@@ -86,11 +92,6 @@ function createMainWindow() {
      mainWindow.once('ready-to-show', () => {
        mainWindow.show();
        console.log('Окно отображено');
-
-       // В режиме разработки открываем инструменты разработчика
-       if (process.env.NODE_ENV === 'development') {
-         mainWindow.webContents.openDevTools();
-       }
      });
 
      // Обработчик ошибок загрузки
@@ -123,137 +124,8 @@ function createMainWindow() {
 
 // Создание меню приложения
 function createMenu() {
-  const template = [
-    {
-      label: 'Файл',
-      submenu: [
-        {
-          label: 'Настройки',
-          click: () => {
-            if (mainWindow) {
-              mainWindow.webContents.send('show-settings');
-            }
-          }
-        },
-        {
-          type: 'separator'
-        },
-        {
-          label: 'Выход',
-          accelerator: process.platform === 'darwin' ? 'Cmd+Q' : 'Ctrl+Q',
-          click: () => {
-            app.quit();
-          }
-        }
-      ]
-    },
-    {
-      label: 'Инструменты',
-      submenu: [
-        {
-          label: 'Обнаружить GTA 5',
-          click: () => {
-            detectGTAPath();
-          }
-        },
-        {
-          label: 'Проверить редуксы',
-          click: () => {
-            if (mainWindow) {
-              mainWindow.webContents.send('check-reduxes');
-            }
-          }
-        },
-        {
-          type: 'separator'
-        },
-        {
-          label: 'Открыть папку с игрой',
-          click: () => {
-            if (appSettings.gtaPath) {
-              shell.openPath(appSettings.gtaPath);
-            } else {
-              dialog.showMessageBox(mainWindow, {
-                type: 'warning',
-                title: 'Папка не найдена',
-                message: 'Сначала укажите папку с GTA 5 в настройках'
-              });
-            }
-          }
-        }
-      ]
-    },
-    {
-      label: 'Помощь',
-      submenu: [
-        {
-          label: 'Документация',
-          click: () => {
-            shell.openExternal('https://github.com/reduxion/launcher/wiki');
-          }
-        },
-        {
-          label: 'Сообщить о проблеме',
-          click: () => {
-            shell.openExternal('https://github.com/reduxion/launcher/issues');
-          }
-        },
-        {
-          type: 'separator'
-        },
-        {
-          label: 'О программе',
-          click: () => {
-            dialog.showMessageBox(mainWindow, {
-              type: 'info',
-              title: 'Reduxion Launcher',
-              message: `Версия: ${app.getVersion()}\nElectron: ${process.versions.electron}\nNode.js: ${process.versions.node}\nПлатформа: ${os.platform()} ${os.arch()}`,
-              buttons: ['OK']
-            });
-          }
-        }
-      ]
-    }
-  ];
-
-  // Добавляем меню разработки для macOS
-  if (process.platform === 'darwin') {
-    template.unshift({
-      label: app.getName(),
-      submenu: [
-        {
-          role: 'about'
-        },
-        {
-          type: 'separator'
-        },
-        {
-          role: 'services'
-        },
-        {
-          type: 'separator'
-        },
-        {
-          role: 'hide'
-        },
-        {
-          role: 'hideothers'
-        },
-        {
-          role: 'unhide'
-        },
-        {
-          type: 'separator'
-        },
-        {
-          role: 'quit'
-        }
-      ]
-    });
-  }
-
-  const menu = Menu.buildFromTemplate(template);
-  Menu.setApplicationMenu(menu);
+  // Отключаем меню полностью
+  Menu.setApplicationMenu(null);
 }
 
 // Обнаружение пути к GTA 5
@@ -293,11 +165,13 @@ async function detectGTAPath() {
       if (fs.existsSync(exePath)) {
         foundPath = selectedPath;
       } else {
-        dialog.showMessageBox(mainWindow, {
-          type: 'error',
-          title: 'Неверная папка',
-          message: 'В выбранной папке не найден файл GTA5.exe'
-        });
+        if (mainWindow) {
+          mainWindow.webContents.send('ui-message', {
+            title: 'Неверная папка',
+            message: 'В выбранной папке не найден файл GTA5.exe',
+            buttons: ['OK']
+          });
+        }
         return;
       }
     }
@@ -307,17 +181,81 @@ async function detectGTAPath() {
     appSettings.gtaPath = foundPath;
     saveSettings();
 
-    dialog.showMessageBox(mainWindow, {
-      type: 'info',
-      title: 'Папка найдена',
-      message: `Папка с GTA 5 обнаружена:\n${foundPath}`
-    });
+    if (mainWindow) {
+      mainWindow.webContents.send('ui-message', {
+        title: 'Папка найдена',
+        message: `Папка с GTA 5 обнаружена:\n${foundPath}`,
+        buttons: ['OK']
+      });
+    }
 
     if (mainWindow) {
       mainWindow.webContents.send('gta-path-detected', foundPath);
     }
   }
 }
+
+// Обработчики управления окном
+ipcMain.on('window-minimize', () => {
+  if (mainWindow) mainWindow.minimize();
+});
+
+ipcMain.on('minimize-window', () => {
+  if (mainWindow) mainWindow.minimize();
+});
+
+ipcMain.on('window-close', () => {
+  if (mainWindow) mainWindow.close();
+});
+
+ipcMain.on('close-window', () => {
+  if (mainWindow) mainWindow.close();
+});
+
+// Проверка первого запуска
+ipcMain.on('check-first-run', (event) => {
+  const isFirstRun = !appSettings.gtaPath || appSettings.gtaPath === '';
+  event.reply('first-run-status', isFirstRun);
+});
+
+// Выбор пути к GTA
+ipcMain.on('browse-gta-path', async (event) => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ['openDirectory'],
+    title: 'Выберите папку с GTA 5',
+    defaultPath: 'C:\\Program Files'
+  });
+  
+  if (!result.canceled && result.filePaths.length > 0) {
+    const selectedPath = result.filePaths[0];
+    
+    // Проверяем, что это действительно папка с GTA 5
+    const gtaExePath = path.join(selectedPath, 'GTA5.exe');
+    if (fs.existsSync(gtaExePath)) {
+      event.reply('gta-path-selected', selectedPath);
+    } else {
+      if (mainWindow) {
+        mainWindow.webContents.send('ui-message', {
+          title: 'Ошибка',
+          message: 'В выбранной папке не найден файл GTA5.exe',
+          buttons: ['OK']
+        });
+      }
+    }
+  }
+});
+
+// Сохранение настроек после первого запуска
+ipcMain.on('save-setup', (event, setupData) => {
+  appSettings.gtaPath = setupData.gtaPath;
+  appSettings.language = setupData.language;
+  appSettings.autoInstall = setupData.autoInstall;
+  appSettings.createDesktopShortcut = setupData.desktopShortcut;
+  
+  saveSettings();
+  
+  console.log('Настройки сохранены:', appSettings);
+});
 
 // IPC обработчики для связи с renderer процессом
 ipcMain.handle('get-settings', () => appSettings);
@@ -488,6 +426,28 @@ ipcMain.handle('check-game-process', async () => {
      });
    });
  });
+
+// Обработчик ручной проверки обновлений
+ipcMain.on('check-updates-manual', async (event) => {
+  try {
+    const updateInfo = await checkForUpdates();
+    
+    if (mainWindow) {
+      mainWindow.webContents.send('update-check-result', {
+        hasUpdate: updateInfo.hasUpdate,
+        version: updateInfo.hasUpdate ? updateInfo.version : CURRENT_VERSION
+      });
+    }
+  } catch (error) {
+    console.error('Ошибка проверки обновлений:', error);
+    if (mainWindow) {
+      mainWindow.webContents.send('update-check-result', {
+        hasUpdate: false,
+        error: error.message
+      });
+    }
+  }
+});
 
 // ===== ОБРАБОТЧИКИ ДЛЯ УСТАНОВЩИКА =====
 ipcMain.handle('select-install-folder', async () => {
@@ -703,13 +663,228 @@ async function createStartMenuShortcut(installDir) {
   }
 }
 
+// Проверка обновлений
+async function checkForUpdates() {
+  return new Promise((resolve) => {
+    const versionUrl = 'https://raw.githubusercontent.com/tumbwumba-dot/launcherlaunceherlalalasllasldla/master/version.json';
+    
+    https.get(versionUrl, (res) => {
+      let data = '';
+      
+      res.on('data', (chunk) => {
+        data += chunk;
+      });
+      
+      res.on('end', () => {
+        try {
+          const versionInfo = JSON.parse(data);
+          console.log('Текущая версия:', CURRENT_VERSION);
+          console.log('Доступная версия:', versionInfo.version);
+          
+          if (versionInfo.version !== CURRENT_VERSION) {
+            resolve({ hasUpdate: true, installerUrl: versionInfo.installerUrl, version: versionInfo.version });
+          } else {
+            resolve({ hasUpdate: false, version: CURRENT_VERSION });
+          }
+        } catch (error) {
+          console.error('Ошибка парсинга версии:', error);
+          resolve({ hasUpdate: false, version: CURRENT_VERSION });
+        }
+      });
+    }).on('error', (error) => {
+      console.error('Ошибка проверки обновлений:', error);
+      resolve({ hasUpdate: false });
+    });
+  });
+}
+
+// Скачивание и запуск установщика
+async function downloadAndRunInstaller(installerUrl) {
+  const tempDir = path.join(os.tmpdir(), 'reduxion-update');
+  const installerPath = path.join(tempDir, 'ReduxionLauncherInstaller.exe');
+  
+  // Создаем временную папку
+  if (!fs.existsSync(tempDir)) {
+    fs.mkdirSync(tempDir, { recursive: true });
+  }
+  
+  return new Promise((resolve, reject) => {
+    const file = fs.createWriteStream(installerPath);
+    
+    https.get(installerUrl, (response) => {
+      // Обработка редиректов
+      if (response.statusCode === 302 || response.statusCode === 301) {
+        https.get(response.headers.location, (redirectResponse) => {
+          redirectResponse.pipe(file);
+          
+          file.on('finish', () => {
+            file.close();
+            console.log('Установщик скачан:', installerPath);
+            
+            // Запускаем установщик
+            exec(`"${installerPath}"`, (error) => {
+              if (error) {
+                console.error('Ошибка запуска установщика:', error);
+                reject(error);
+              } else {
+                resolve();
+              }
+            });
+          });
+        });
+      } else {
+        response.pipe(file);
+        
+        file.on('finish', () => {
+          file.close();
+          console.log('Установщик скачан:', installerPath);
+          
+          // Запускаем установщик
+          exec(`"${installerPath}"`, (error) => {
+            if (error) {
+              console.error('Ошибка запуска установщика:', error);
+              reject(error);
+            } else {
+              resolve();
+            }
+          });
+        });
+      }
+    }).on('error', (error) => {
+      fs.unlink(installerPath, () => {});
+      reject(error);
+    });
+  });
+}
+
+// IPC обработчики для системы загрузок
+ipcMain.handle('start-redux-download', async (event, redux, downloadUrl) => {
+  if (!downloadManager) {
+    downloadManager = new DownloadManager();
+  }
+  
+  if (!appSettings.gtaPath) {
+    throw new Error('GTA путь не настроен');
+  }
+  
+  const downloadId = downloadManager.addDownload(redux, downloadUrl, appSettings.gtaPath, mainWindow);
+  return { success: true, downloadId };
+});
+
+ipcMain.handle('cancel-download', async (event, downloadId) => {
+  if (downloadManager) {
+    downloadManager.cancelDownload(downloadId);
+    return { success: true };
+  }
+  return { success: false };
+});
+
+ipcMain.handle('get-all-downloads', async () => {
+  if (downloadManager) {
+    return downloadManager.getAllDownloads();
+  }
+  return [];
+});
+
+ipcMain.handle('uninstall-redux', async (event, reduxId) => {
+  if (!downloadManager) {
+    downloadManager = new DownloadManager();
+  }
+  
+  if (!appSettings.gtaPath) {
+    throw new Error('GTA путь не настроен');
+  }
+  
+  try {
+    await downloadManager.uninstallRedux(reduxId, appSettings.gtaPath);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
 // Инициализация приложения
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
    try {
      console.log('Инициализация приложения...');
      loadSettings();
+     downloadManager = new DownloadManager();
      createMenu();
      createMainWindow();
+     
+     // Ждем загрузки окна
+     mainWindow.webContents.on('did-finish-load', async () => {
+       // Отправляем статус загрузки лаунчера
+       mainWindow.webContents.send('loading-status', 'Загрузка...');
+       
+       // Имитируем загрузку лаунчера
+       await new Promise(resolve => setTimeout(resolve, 1500));
+       
+       // Отправляем статус проверки обновлений
+       mainWindow.webContents.send('loading-status', 'Проверка обновлений...');
+       
+       // Проверяем обновления
+       console.log('Проверка обновлений...');
+       const updateInfo = await checkForUpdates();
+       
+       // Даем время увидеть текст "Проверка обновлений..."
+       await new Promise(resolve => setTimeout(resolve, 1500));
+       
+       if (updateInfo.hasUpdate) {
+         console.log('Найдено обновление!');
+         mainWindow.webContents.send('loading-status', 'Найдено обновление!');
+         
+         await new Promise(resolve => setTimeout(resolve, 1000));
+         
+         // Встроенное подтверждение обновления
+         const confirmId = 'upd-' + Date.now();
+         if (mainWindow) {
+           mainWindow.webContents.send('ui-confirm', {
+             id: confirmId,
+             title: 'Доступно обновление',
+             message: 'Найдена новая версия Reduxion Launcher!\nУстановить обновление сейчас?',
+             confirmText: 'Установить',
+             cancelText: 'Позже'
+           });
+         }
+
+         const userConfirmed = await new Promise((resolve) => {
+           function handler(event, payload) {
+             if (payload.id === confirmId) {
+               ipcMain.removeListener('ui-confirm-result', handler);
+               resolve(!!payload.confirmed);
+             }
+           }
+           ipcMain.on('ui-confirm-result', handler);
+         });
+
+         if (userConfirmed) {
+           mainWindow.webContents.send('loading-status', 'Скачивание обновления...');
+           console.log('Скачивание обновления...');
+           try {
+             await downloadAndRunInstaller(updateInfo.installerUrl);
+             // Закрываем текущий лаунчер
+             app.quit();
+             return;
+           } catch (error) {
+             console.error('Ошибка при обновлении:', error);
+             if (mainWindow) {
+               mainWindow.webContents.send('ui-message', {
+                 title: 'Ошибка обновления',
+                 message: 'Не удалось скачать обновление: ' + error.message,
+                 buttons: ['OK']
+               });
+             }
+           }
+         }
+       }
+       
+       // Обновлений нет, загружаем основной интерфейс
+       mainWindow.webContents.send('loading-status', 'Загрузка интерфейса...');
+       await new Promise(resolve => setTimeout(resolve, 500));
+       mainWindow.webContents.send('loading-complete');
+     });
+     
      console.log('Приложение инициализировано успешно');
    } catch (error) {
      console.error('Ошибка инициализации:', error);

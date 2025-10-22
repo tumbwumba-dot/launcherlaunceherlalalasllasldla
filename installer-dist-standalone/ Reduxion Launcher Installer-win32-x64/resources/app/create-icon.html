@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Icon Generator</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #1a1a1a;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+        canvas {
+            border: 2px solid #333;
+            margin: 10px;
+        }
+        .container {
+            text-align: center;
+        }
+        button {
+            background: linear-gradient(135deg, #E91E63, #9C27B0);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 8px;
+            margin: 10px;
+        }
+        button:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Reduxion Icon Generator</h1>
+        <canvas id="icon256" width="256" height="256"></canvas>
+        <canvas id="icon512" width="512" height="512"></canvas>
+        <canvas id="icon1024" width="1024" height="1024"></canvas>
+        <br>
+        <button onclick="downloadIcon(256)">Скачать 256x256</button>
+        <button onclick="downloadIcon(512)">Скачать 512x512</button>
+        <button onclick="downloadIcon(1024)">Скачать 1024x1024</button>
+    </div>
+
+    <script>
+        function drawIcon(size) {
+            const canvas = document.getElementById('icon' + size);
+            const ctx = canvas.getContext('2d');
+            
+            // Очищаем canvas
+            ctx.clearRect(0, 0, size, size);
+            
+            // Создаем радиальный градиент для фона
+            const bgGradient = ctx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
+            bgGradient.addColorStop(0, 'rgba(233, 30, 99, 0.2)');
+            bgGradient.addColorStop(1, 'rgba(10, 10, 15, 1)');
+            
+            // Рисуем фон
+            ctx.fillStyle = bgGradient;
+            ctx.fillRect(0, 0, size, size);
+            
+            // Создаем градиент для буквы R
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#E91E63');
+            gradient.addColorStop(1, '#9C27B0');
+            
+            // Настройки для буквы R
+            ctx.fillStyle = gradient;
+            ctx.font = `900 italic ${size * 0.7}px Montserrat, Arial, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // Добавляем тень для глубины
+            ctx.shadowColor = 'rgba(233, 30, 99, 0.5)';
+            ctx.shadowBlur = size * 0.05;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = size * 0.02;
+            
+            // Рисуем букву R
+            ctx.fillText('R', size/2, size/2);
+            
+            // Добавляем обводку
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = size * 0.01;
+            ctx.strokeText('R', size/2, size/2);
+        }
+
+        function downloadIcon(size) {
+            const canvas = document.getElementById('icon' + size);
+            const link = document.createElement('a');
+            link.download = `icon-${size}x${size}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // Рисуем все иконки при загрузке
+        window.onload = function() {
+            drawIcon(256);
+            drawIcon(512);
+            drawIcon(1024);
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+appId: com.reduxion.launcher.installer
+productName: Reduxion Launcher Installer
+copyright: Copyright © 2025 Reduxion Team
+
+directories:
+  output: installer-dist-final
+  buildResources: assets
+
+files:
+  - installer.html
+  - installer-majestic.css
+  - installer-main.js
+  - downloader.js
+  - package.json
+  - assets/**/*
+  - '!**/*.md'
+  - '!**/*.log'
+  - '!node_modules/**/*'
+  - '!dist/**/*'
+  - '!build/**/*'
+
+extraMetadata:
+  main: installer-main.js
+
+extraResources:
+  - from: launcher-dist
+    to: launcher-dist
+
+win:
+  target:
+    - target: portable
+      arch:
+        - x64
+  icon: assets/icon.ico
+  artifactName: ReduxionLauncherInstaller.exe
+
+portable:
+  artifactName: ReduxionLauncherInstaller.exe

@@ -1,0 +1,29 @@
+appId: com.reduxion.launcher
+productName: Reduxion Launcher
+copyright: Copyright © 2025 Reduxion Team
+
+directories:
+  output: launcher-dist
+  buildResources: assets
+
+files:
+  - modern-launcher.html
+  - main.js
+  - package.json
+  - node_modules/**/*
+
+asar: true
+
+extraMetadata:
+  main: main.js
+
+win:
+  target:
+    - target: portable
+      arch:
+        - x64
+  icon: build/icon.png
+  artifactName: ReduxionLauncher.exe
+
+portable:
+  artifactName: ReduxionLauncher.exe
