@@ -25,7 +25,7 @@ function safeSendToRenderer(channel, data) {
 }
 
 // Текущая версия лаунчера
-const CURRENT_VERSION = '1.1.0';
+const CURRENT_VERSION = '1.2.0';
 
 // Путь к настройкам приложения
 const settingsPath = path.join(app.getPath('userData'), 'settings.json');
@@ -992,18 +992,25 @@ ipcMain.on('download-redux', async (event, data) => {
   }
 });
 
-// Отмена загрузки
-ipcMain.on('cancel-download', (event, data) => {
+// Открытие папки в проводнике
+ipcMain.on('open-folder', (event, folderPath) => {
+  try {
+    const { shell } = require('electron');
+    shell.showItemInFolder(folderPath);
+  } catch (error) {
+    console.error('Ошибка открытия папки:', error);
+  }
+});
+
+// Пауза загрузки
+ipcMain.on('pause-download', (event, data) => {
   const { downloadId } = data;
   const task = activeDownloads.get(downloadId);
 
   if (task) {
-    console.log('Cancelling download:', downloadId);
-    task.cancel();
-    activeDownloads.delete(downloadId);
-    console.log('Загрузка отменена успешно:', downloadId);
-  } else {
-    console.log('Загрузка не найдена для отмены:', downloadId);
+    console.log('Pausing download:', downloadId);
+    task.cancel(); // Пока используем cancel для паузы
+    // TODO: Реализовать настоящую паузу с возможностью возобновления
   }
 });
 
