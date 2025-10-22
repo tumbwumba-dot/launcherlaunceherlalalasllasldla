@@ -666,7 +666,9 @@ async function createStartMenuShortcut(installDir) {
 // Проверка обновлений
 async function checkForUpdates() {
   return new Promise((resolve) => {
-    const versionUrl = 'https://raw.githubusercontent.com/tumbwumba-dot/launcherlaunceherlalalasllasldla/master/version.json';
+    // Добавляем timestamp для обхода GitHub кеша
+    const cacheBuster = Date.now();
+    const versionUrl = `https://raw.githubusercontent.com/tumbwumba-dot/launcherlaunceherlalalasllasldla/master/version.json?t=${cacheBuster}`;
     
     https.get(versionUrl, (res) => {
       let data = '';
