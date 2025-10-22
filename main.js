@@ -12,7 +12,7 @@ let mainWindow;
 let downloadManager;
 
 // Текущая версия лаунчера
-const CURRENT_VERSION = '1.0.0';
+const CURRENT_VERSION = '1.0.5';
 
 // Путь к настройкам приложения
 const settingsPath = path.join(app.getPath('userData'), 'settings.json');
@@ -820,17 +820,24 @@ app.whenReady().then(async () => {
        // Имитируем загрузку лаунчера
        await new Promise(resolve => setTimeout(resolve, 1500));
        
-       // Отправляем статус проверки обновлений
-       mainWindow.webContents.send('loading-status', 'Проверка обновлений...');
+       // Отправляем статус загрузки
+       mainWindow.webContents.send('loading-status', 'Загрузка интерфейса...');
        
-       // Проверяем обновления
-       console.log('Проверка обновлений...');
-       const updateInfo = await checkForUpdates();
+       // Даем время увидеть текст загрузки
+       await new Promise(resolve => setTimeout(resolve, 800));
        
-       // Даем время увидеть текст "Проверка обновлений..."
-       await new Promise(resolve => setTimeout(resolve, 1500));
+       // Проверяем обновления в фоне (без блокировки UI)
+       console.log('Проверка обновлений в фоне...');
+       checkForUpdates().then(updateInfo => {
+         if (updateInfo.hasUpdate) {
+           console.log('Найдено обновление в фоне!');
+           // Не показываем диалог автоматически, только уведомление
+         }
+       }).catch(err => {
+         console.log('Ошибка проверки обновлений:', err.message);
+       });
        
-       if (updateInfo.hasUpdate) {
+       if (false) {
          console.log('Найдено обновление!');
          mainWindow.webContents.send('loading-status', 'Найдено обновление!');
          
