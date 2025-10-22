@@ -25,7 +25,7 @@ function safeSendToRenderer(channel, data) {
 }
 
 // Текущая версия лаунчера
-const CURRENT_VERSION = '1.0.8';
+const CURRENT_VERSION = '1.0.9';
 
 // Путь к настройкам приложения
 const settingsPath = path.join(app.getPath('userData'), 'settings.json');
@@ -302,35 +302,6 @@ ipcMain.handle('open-folder-dialog', async () => {
     return result.filePaths[0];
   }
   return null;
-});
-
-ipcMain.handle('download-redux', async (event, reduxData) => {
-  try {
-    const axios = require('axios');
-    const response = await axios.get(reduxData.downloadUrl, {
-      responseType: 'arraybuffer'
-    });
-
-    const downloadsPath = path.join(os.homedir(), 'Downloads', 'Reduxion');
-    await fs.ensureDir(downloadsPath);
-
-    const fileName = `redux-${reduxData.id}-${Date.now()}.zip`;
-    const filePath = path.join(downloadsPath, fileName);
-
-    await fs.writeFile(filePath, response.data);
-
-    return {
-      success: true,
-      filePath: filePath,
-      fileName: fileName
-    };
-  } catch (error) {
-    console.error('Ошибка скачивания редукса:', error);
-    return {
-      success: false,
-      error: error.message
-    };
-  }
 });
 
 ipcMain.handle('install-redux', async (event, reduxData) => {
@@ -825,15 +796,20 @@ ipcMain.on('download-redux', async (event, data) => {
   const { downloadId, url, reduxId } = data;
   
   try {
-    console.log('Начинается загрузка:', url);
+    console.log('=== НАЧАЛО ЗАГРУЗКИ ===');
+    console.log('Download ID:', downloadId);
+    console.log('URL:', url);
+    console.log('Redux ID:', reduxId);
     
     const downloadsDir = path.join(app.getPath('userData'), 'downloads');
     await fs.ensureDir(downloadsDir);
+    console.log('Папка загрузок создана:', downloadsDir);
     
     // Определяем расширение из URL
     const fileExt = url.endsWith('.rar') ? '.rar' : '.zip';
     const fileName = `${reduxId}${fileExt}`;
     const filePath = path.join(downloadsDir, fileName);
+    console.log('Путь к файлу:', filePath);
     
     // Создаем HTTP запрос
     const file = fs.createWriteStream(filePath);
@@ -843,10 +819,16 @@ ipcMain.on('download-redux', async (event, data) => {
     let request = null;
     let isCancelled = false;
     
+    console.log('Начинаем HTTP запрос...');
+    
     const startDownload = (downloadUrl) => {
+      console.log('Запуск загрузки с URL:', downloadUrl);
       request = https.get(downloadUrl, (response) => {
+        console.log('Получен ответ от сервера:', response.statusCode);
+        
         // Обработка редиректов
         if (response.statusCode === 302 || response.statusCode === 301) {
+          console.log('Редирект на:', response.headers.location);
           request.abort();
           startDownload(response.headers.location);
           return;
@@ -865,13 +847,17 @@ ipcMain.on('download-redux', async (event, data) => {
     };
     
     function handleDownload(response) {
+      console.log('Обработка ответа загрузки...');
+      
       if (isCancelled) {
+        console.log('Загрузка отменена, прерываем обработку');
         response.destroy();
         return;
       }
       
       if (response.statusCode !== 200) {
         const error = `HTTP ${response.statusCode}`;
+        console.error('Ошибка HTTP:', error);
         safeSendToRenderer('download-error', {
           downloadId: downloadId,
           error: error
@@ -881,6 +867,7 @@ ipcMain.on('download-redux', async (event, data) => {
       }
       
       totalBytes = parseInt(response.headers['content-length'], 10);
+      console.log('Размер файла:', totalBytes, 'байт');
       
       response.on('data', (chunk) => {
         if (isCancelled) {
@@ -958,6 +945,7 @@ ipcMain.on('download-redux', async (event, data) => {
       }
     });
     
+    console.log('Запускаем загрузку...');
     startDownload(url);
     
   } catch (error) {
