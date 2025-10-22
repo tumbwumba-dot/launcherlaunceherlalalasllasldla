@@ -159,32 +159,21 @@ async function startInstallation() {
     
     // URL к архиву с лаунчером (замени на свой URL)
     // Можно использовать GitHub Releases, Dropbox, Google Drive или свой сервер
-    const downloadUrl = 'https://github.com/tumbwumba-dot/launcherlaunceherlalalasllasldla/releases/download/v1.0.0/launcher.zip';
+    const downloadUrl = 'https://github.com/tumbwumba-dot/launcherlaunceherlalalasllasldla/releases/download/v1.0.5/ReduxionLauncher.exe';
     
     try {
-      const zipPath = await downloadLauncher(downloadUrl, installPath);
+      const exePath = await downloadLauncher(downloadUrl, installPath);
       
       if (installationCancelled) {
         // Удаляем скачанный файл
-        if (fs.existsSync(zipPath)) fs.unlinkSync(zipPath);
+        if (fs.existsSync(exePath)) fs.unlinkSync(exePath);
         return;
       }
       
-      updateProgress('РАСПАКОВКА ФАЙЛОВ', 3, 5);
-      await sleep(500);
-      
-      // Распаковываем архив
-      await extractZip(zipPath, installPath);
-      
-      // Удаляем архив после распаковки
-      if (fs.existsSync(zipPath)) {
-        fs.unlinkSync(zipPath);
-      }
-      
-      // Проверяем что exe распаковался
+      // Проверяем что exe скачался
       const launcherExe = path.join(installPath, 'ReduxionLauncher.exe');
       if (!fs.existsSync(launcherExe)) {
-        throw new Error('Файл ReduxionLauncher.exe не найден после распаковки');
+        throw new Error('Файл ReduxionLauncher.exe не найден после загрузки');
       }
       
       console.log('Лаунчер успешно установлен:', launcherExe);
@@ -249,7 +238,7 @@ async function downloadLauncher(url, destination) {
       const totalSize = parseInt(response.headers['content-length'], 10);
       let downloadedSize = 0;
       
-      const filePath = path.join(destination, 'launcher.zip');
+      const filePath = path.join(destination, 'ReduxionLauncher.exe');
       const fileStream = fs.createWriteStream(filePath);
       
       response.on('data', (chunk) => {
