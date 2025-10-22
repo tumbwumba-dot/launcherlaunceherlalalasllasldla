@@ -1544,6 +1544,7 @@
             featured.forEach(redux => {
                 featuredList.appendChild(createReduxItem(redux));
             });
+            
             // Recent
             const recentHeader = document.getElementById('recent-header');
             const recentList = document.getElementById('recent-list');
@@ -1714,6 +1715,13 @@
                 document.getElementById('home-page').style.display = page === 'home' ? 'block' : 'none';
                 document.getElementById('settings-page').style.display = page === 'settings' ? 'block' : 'none';
                 document.getElementById('downloads-page').style.display = page === 'downloads' ? 'block' : 'none';
+                
+                // Загружаем данные для соответствующих страниц
+                if (page === 'home') {
+                    loadReduxes();
+                } else if (page === 'downloads') {
+                    renderDownloads();
+                }
             });
         });
 
@@ -2469,6 +2477,11 @@
             loadReduxes();
             loadSettingsUI();
             setupDownloadControls(); // Настраиваем новые элементы управления загрузками
+            
+            // Показываем главную страницу по умолчанию
+            document.getElementById('home-page').style.display = 'block';
+            document.getElementById('settings-page').style.display = 'none';
+            document.getElementById('downloads-page').style.display = 'none';
             
             // Привязки контролов настроек
             const autoInstall = document.getElementById('autoInstallToggle');

@@ -25,7 +25,7 @@ function safeSendToRenderer(channel, data) {
 }
 
 // Текущая версия лаунчера
-const CURRENT_VERSION = '1.2.0';
+const CURRENT_VERSION = '1.2.1';
 
 // Путь к настройкам приложения
 const settingsPath = path.join(app.getPath('userData'), 'settings.json');
