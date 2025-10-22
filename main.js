@@ -25,7 +25,7 @@ function safeSendToRenderer(channel, data) {
 }
 
 // Текущая версия лаунчера
-const CURRENT_VERSION = '1.0.7';
+const CURRENT_VERSION = '1.0.8';
 
 // Путь к настройкам приложения
 const settingsPath = path.join(app.getPath('userData'), 'settings.json');
@@ -982,9 +982,18 @@ ipcMain.on('cancel-download', (event, data) => {
       download.cancel();
     }
     
+    // Удаляем из активных загрузок
     activeDownloads.delete(downloadId);
     
     // Уведомляем frontend об отмене
+    safeSendToRenderer('download-cancelled', {
+      downloadId: downloadId
+    });
+    
+    console.log('Загрузка отменена успешно:', downloadId);
+  } else {
+    console.log('Загрузка не найдена для отмены:', downloadId);
+    // Все равно уведомляем frontend
     safeSendToRenderer('download-cancelled', {
       downloadId: downloadId
     });

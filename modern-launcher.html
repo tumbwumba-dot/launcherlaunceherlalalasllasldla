@@ -934,7 +934,7 @@
 
     <div class="main-container">
         <header class="top-bar">
-            <div class="version-badge">v1.0.7 (alpha)</div>
+            <div class="version-badge">v1.0.8 (alpha)</div>
             <div class="window-controls">
                 <button class="window-btn" onclick="minimizeWindow()">−</button>
                 <button class="window-btn" onclick="closeWindow()">×</button>
@@ -1042,7 +1042,7 @@
                         <div class="setting-item">
                             <div class="setting-left">
                                 <div class="setting-label">Версия лаунчера</div>
-                                <div class="setting-value">v1.0.7 (alpha)</div>
+                                <div class="setting-value">v1.0.8 (alpha)</div>
                             </div>
                             <button class="setting-button" onclick="checkUpdatesNow()">Проверить обновления</button>
                         </div>
@@ -1316,9 +1316,10 @@
         // Функция для возобновления загрузки
         function resumeDownload(downloadId) {
             const download = activeDownloads.get(downloadId);
-            if (!download || download.state !== 'downloading') return;
+            if (!download || (download.state !== 'downloading' && download.state !== 'ready-to-resume' && download.state !== 'error' && download.state !== 'cancelled')) return;
             
             download.status = 'Возобновление...';
+            download.state = 'downloading';
             saveActiveDownloads();
             renderDownloads();
             
@@ -1477,6 +1478,11 @@
             savedDownloads.forEach(download => {
                 // Проверяем, не завершена ли загрузка
                 if (download.state === 'downloading' || download.state === 'ready-to-install') {
+                    // Если загрузка была прервана, помечаем как готовую к возобновлению
+                    if (download.state === 'downloading') {
+                        download.state = 'ready-to-resume';
+                        download.status = 'Готово к возобновлению';
+                    }
                     activeDownloads.set(download.id, download);
                 }
             });
@@ -1701,6 +1707,20 @@
             
             // Отправляем запрос на отмену в backend
             ipcRenderer.send('cancel-download', { downloadId: downloadId });
+            
+            // Таймаут на случай, если отмена не сработает
+            setTimeout(() => {
+                const currentDownload = activeDownloads.get(downloadId);
+                if (currentDownload && currentDownload.status === 'Отмена...') {
+                    console.log('Таймаут отмены загрузки, принудительно отменяем:', downloadId);
+                    currentDownload.status = 'Отменено';
+                    currentDownload.state = 'cancelled';
+                    activeDownloads.delete(downloadId);
+                    saveActiveDownloads();
+                    renderDownloads();
+                    showToast('warn', `Загрузка ${currentDownload.name} отменена`);
+                }
+            }, 3000); // 3 секунды таймаут
         }
 
         function renderDownloads() {
@@ -1757,6 +1777,7 @@
             const isDownloading = download.state === 'downloading';
             const isError = download.state === 'error';
             const isCancelled = download.state === 'cancelled';
+            const isReadyToResume = download.state === 'ready-to-resume';
             
             item.innerHTML = `
                 <div class="download-header">
@@ -1784,9 +1805,9 @@
                                 </svg>
                             </button>
                         ` : ''}
-                        ${isError || isCancelled ? `
+                        ${isError || isCancelled || isReadyToResume ? `
                             <button class="download-install-btn" onclick="resumeDownload('${download.id}')" style="background: rgba(33, 208, 122, 0.8);">
-                                Возобновить
+                                ${isReadyToResume ? 'Возобновить' : 'Возобновить'}
                             </button>
                         ` : ''}
                     </div>
