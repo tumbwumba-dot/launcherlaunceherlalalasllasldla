@@ -796,20 +796,47 @@
         }
 
         .download-card {
-            background: #15161d;
+            background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 16px;
+            border-radius: 12px;
             padding: 20px;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
+            animation: slideInUp 0.4s ease-out;
         }
 
         .download-card:hover {
             border-color: rgba(233, 30, 99, 0.3);
-            background: #181922;
+            background: rgba(255, 255, 255, 0.05);
             transform: translateY(-2px);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .download-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(233, 30, 99, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .download-card:hover::before {
+            left: 100%;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .download-card-header {
@@ -898,6 +925,17 @@
             box-shadow: 0 0 0 3px rgba(255, 204, 77, 0.12);
         }
 
+        /* Новые статусы: готов к установке и установлен */
+        .status-indicator.ready {
+            background: #4dabf7;
+            box-shadow: 0 0 0 3px rgba(77, 171, 247, 0.18);
+        }
+
+        .status-indicator.installed {
+            background: #21d07a;
+            box-shadow: 0 0 0 3px rgba(33, 208, 122, 0.18);
+        }
+
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
@@ -915,10 +953,30 @@
             font-size: 12px;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border: none;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .download-card-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s ease, height 0.3s ease;
+        }
+
+        .download-card-btn:hover::before {
+            width: 300px;
+            height: 300px;
         }
 
         .download-card-btn.primary {
@@ -981,8 +1039,30 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
             animation: shimmer 2s infinite;
+        }
+
+        .download-progress-bar {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .download-progress-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, #e91e63 0%, #c2185b 50%, #e91e63 100%);
+            background-size: 200% 100%;
+            animation: gradientShift 3s ease-in-out infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
         }
 
         .download-progress-info {
@@ -1075,6 +1155,305 @@
         .empty-action-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 24px rgba(233, 30, 99, 0.4);
+        }
+
+        /* Новый минималистичный дизайн страницы загрузок */
+        .downloads-header-new {
+            margin-bottom: 32px;
+            padding: 24px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .downloads-title-new {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .title-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #e91e63 0%, #c2185b 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .title-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .downloads-title-new h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        .downloads-stats-new {
+            display: flex;
+            gap: 12px;
+            margin-left: auto;
+        }
+
+        .stat-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stat-badge.active {
+            background: rgba(233, 30, 99, 0.15);
+            color: #e91e63;
+        }
+
+        .stat-badge.completed {
+            background: rgba(76, 175, 80, 0.15);
+            color: #4caf50;
+        }
+
+        .downloads-controls-new {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .search-input-new {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .search-input-new:focus {
+            outline: none;
+            border-color: rgba(233, 30, 99, 0.4);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .search-input-new::placeholder {
+            color: #666677;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .quick-btn {
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            color: #888899;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quick-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(233, 30, 99, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s ease, height 0.3s ease;
+        }
+
+        .quick-btn:hover::before {
+            width: 100px;
+            height: 100px;
+        }
+
+        .quick-btn:hover {
+            background: rgba(233, 30, 99, 0.1);
+            border-color: rgba(233, 30, 99, 0.3);
+            color: #e91e63;
+        }
+
+        .quick-btn.danger:hover {
+            background: rgba(255, 77, 97, 0.1);
+            border-color: rgba(255, 77, 97, 0.3);
+            color: #ff4d61;
+        }
+
+        .quick-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .downloads-content {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .downloads-section-new {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .section-header-new {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .section-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .section-icon.active {
+            background: rgba(233, 30, 99, 0.15);
+            color: #e91e63;
+        }
+
+        .section-icon.completed {
+            background: rgba(76, 175, 80, 0.15);
+            color: #4caf50;
+        }
+
+        .section-icon svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .section-count-new {
+            background: rgba(255, 255, 255, 0.1);
+            color: #888899;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: auto;
+        }
+
+        .downloads-list-new {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .downloads-empty-new {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            text-align: center;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .empty-content {
+            max-width: 300px;
+        }
+
+        .empty-icon-new {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888899;
+        }
+
+        .empty-icon-new svg {
+            width: 32px;
+            height: 32px;
+        }
+
+        .empty-content h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+
+        .empty-content p {
+            font-size: 14px;
+            color: #888899;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .empty-btn {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #e91e63 0%, #c2185b 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 auto;
+        }
+
+        .empty-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(233, 30, 99, 0.4);
+        }
+
+        .empty-btn svg {
+            width: 16px;
+            height: 16px;
         }
         .settings-page.active {
             display: block;
@@ -1336,64 +1715,39 @@
             </section>
 
             <section class="reduxes-panel downloads-page" id="downloads-page">
-                <!-- Заголовок с контролами -->
-                <div class="downloads-header">
-                    <div class="downloads-title-section">
-                        <h1 class="downloads-title">Загрузки</h1>
-                        <div class="downloads-stats" id="downloads-stats">
-                            <div class="stat-item">
-                                <span class="stat-value" id="active-count">0</span>
-                                <span class="stat-label">Активных</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-value" id="completed-count">0</span>
-                                <span class="stat-label">Завершено</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-value" id="total-speed">0 MB/s</span>
-                                <span class="stat-label">Скорость</span>
-                            </div>
+                <!-- Новый заголовок с минималистичным дизайном -->
+                <div class="downloads-header-new">
+                    <div class="downloads-title-new">
+                        <div class="title-icon">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                            </svg>
+                        </div>
+                        <h1>Загрузки</h1>
+                        <div class="downloads-stats-new" id="downloads-stats">
+                            <div class="stat-badge active" id="active-count">0</div>
+                            <div class="stat-badge completed" id="completed-count">0</div>
                         </div>
                     </div>
                     
-                    <div class="downloads-controls">
-                        <div class="search-box">
-                            <svg class="search-icon" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-                            </svg>
-                            <input type="text" id="download-search" placeholder="Поиск загрузок..." class="search-input">
+                    <!-- Упрощенные контролы -->
+                    <div class="downloads-controls-new">
+                        <div class="search-container">
+                            <input type="text" id="download-search" placeholder="Поиск..." class="search-input-new">
                         </div>
                         
-                        <div class="filter-controls">
-                            <select id="status-filter" class="filter-select">
-                                <option value="all">Все статусы</option>
-                                <option value="downloading">Загружается</option>
-                                <option value="ready-to-install">Готово к установке</option>
-                                <option value="installed">Установлено</option>
-                                <option value="error">Ошибки</option>
-                            </select>
-                            
-                            <select id="sort-filter" class="filter-select">
-                                <option value="newest">Новые сначала</option>
-                                <option value="oldest">Старые сначала</option>
-                                <option value="name">По имени</option>
-                                <option value="size">По размеру</option>
-                                <option value="speed">По скорости</option>
-                            </select>
-                        </div>
-                        
-                        <div class="action-buttons">
-                            <button class="action-btn" id="pause-all-btn" title="Приостановить все">
+                        <div class="quick-actions">
+                            <button class="quick-btn" id="pause-all-btn" title="Приостановить все">
                                 <svg viewBox="0 0 24 24" fill="currentColor">
                                     <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
                                 </svg>
                             </button>
-                            <button class="action-btn" id="resume-all-btn" title="Возобновить все">
+                            <button class="quick-btn" id="resume-all-btn" title="Возобновить все">
                                 <svg viewBox="0 0 24 24" fill="currentColor">
                                     <path d="M8 5v14l11-7z"/>
                                 </svg>
                             </button>
-                            <button class="action-btn" id="clear-completed-btn" title="Очистить завершенные">
+                            <button class="quick-btn danger" id="clear-completed-btn" title="Очистить завершенные">
                                 <svg viewBox="0 0 24 24" fill="currentColor">
                                     <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
                                 </svg>
@@ -1402,46 +1756,62 @@
                     </div>
                 </div>
 
-                <!-- Активные загрузки -->
-                <div class="downloads-section">
-                    <div class="section-header">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                        </svg>
-                        АКТИВНЫЕ ЗАГРУЗКИ
-                        <span class="section-count" id="active-count-badge">0</span>
+                <!-- Основной контент загрузок -->
+                <div class="downloads-content">
+                    <!-- Активные загрузки -->
+                    <div class="downloads-section-new" id="active-downloads-section">
+                        <div class="section-header-new">
+                            <div class="section-title">
+                                <div class="section-icon active">
+                                    <svg viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                    </svg>
+                                </div>
+                                <span>Активные загрузки</span>
+                                <div class="section-count-new" id="active-count-badge">0</div>
+                            </div>
+                        </div>
+                        <div id="downloads-list" class="downloads-list-new">
+                            <!-- Активные загрузки будут здесь -->
+                        </div>
                     </div>
-                    <div id="downloads-list" class="downloads-grid">
-                        <!-- Активные загрузки будут здесь -->
+
+                    <!-- Завершенные загрузки -->
+                    <div class="downloads-section-new" id="completed-downloads-section">
+                        <div class="section-header-new">
+                            <div class="section-title">
+                                <div class="section-icon completed">
+                                    <svg viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+                                    </svg>
+                                </div>
+                                <span>Завершенные загрузки</span>
+                                <div class="section-count-new" id="completed-count-badge">0</div>
+                            </div>
+                        </div>
+                        <div id="downloads-history" class="downloads-list-new">
+                            <!-- Завершенные загрузки будут здесь -->
+                        </div>
                     </div>
                 </div>
 
-                <!-- Завершенные загрузки -->
-                <div class="downloads-section">
-                    <div class="section-header">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
-                        </svg>
-                        ЗАВЕРШЕННЫЕ ЗАГРУЗКИ
-                        <span class="section-count" id="completed-count-badge">0</span>
+                <!-- Новое пустое состояние -->
+                <div class="downloads-empty-new" id="downloads-empty">
+                    <div class="empty-content">
+                        <div class="empty-icon-new">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                            </svg>
+                        </div>
+                        <h3>Нет загрузок</h3>
+                        <p>Начните загрузку редукса, чтобы увидеть его здесь</p>
+                        <button class="empty-btn" onclick="document.querySelector('[data-page=\'home\']').click()">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                            </svg>
+                            Перейти к редуксам
+                        </button>
                     </div>
-                    <div id="downloads-history" class="downloads-grid">
-                        <!-- Завершенные загрузки будут здесь -->
-                    </div>
-                </div>
-
-                <!-- Пустое состояние -->
-                <div class="downloads-empty" id="downloads-empty">
-                    <div class="empty-icon">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                        </svg>
-                    </div>
-                    <div class="empty-title">Нет загрузок</div>
-                    <div class="empty-text">Начните загрузку редукса, чтобы увидеть его здесь</div>
-                    <button class="empty-action-btn" onclick="document.querySelector('[data-page=\'home\']').click()">
-                        Перейти к редуксам
-                    </button>
                 </div>
             </section>
 
@@ -2233,36 +2603,42 @@
             return downloads;
         }
         
-        // Обновление статистики
+        // Обновление статистики для нового дизайна
         function updateDownloadStats(activeDownloads, completedDownloads) {
             const activeCount = document.getElementById('active-count');
             const completedCount = document.getElementById('completed-count');
-            const totalSpeed = document.getElementById('total-speed');
             const activeCountBadge = document.getElementById('active-count-badge');
             const completedCountBadge = document.getElementById('completed-count-badge');
             
+            // Обновляем счетчики в заголовке
             if (activeCount) activeCount.textContent = activeDownloads.length;
             if (completedCount) completedCount.textContent = completedDownloads.length;
+            
+            // Обновляем счетчики в секциях
             if (activeCountBadge) activeCountBadge.textContent = activeDownloads.length;
             if (completedCountBadge) completedCountBadge.textContent = completedDownloads.length;
             
-            // Вычисляем общую скорость
-            let totalSpeedValue = 0;
-            activeDownloads.forEach(download => {
-                if (download.state === 'downloading' && download.speed) {
-                    const speed = parseFloat(download.speed);
-                    if (!isNaN(speed)) {
-                        totalSpeedValue += speed;
-                    }
-                }
-            });
+            // Показываем/скрываем секции в зависимости от наличия загрузок
+            const activeSection = document.getElementById('active-downloads-section');
+            const completedSection = document.getElementById('completed-downloads-section');
+            const emptyState = document.getElementById('downloads-empty');
             
-            if (totalSpeed) {
-                totalSpeed.textContent = totalSpeedValue > 0 ? `${totalSpeedValue.toFixed(1)} MB/s` : '0 MB/s';
+            if (activeSection) {
+                activeSection.style.display = activeDownloads.length > 0 ? 'block' : 'none';
+            }
+            
+            if (completedSection) {
+                completedSection.style.display = completedDownloads.length > 0 ? 'block' : 'none';
+            }
+            
+            // Показываем пустое состояние если нет загрузок
+            if (emptyState) {
+                const hasAnyDownloads = activeDownloads.length > 0 || completedDownloads.length > 0;
+                emptyState.style.display = hasAnyDownloads ? 'none' : 'flex';
             }
         }
 
-        // Создание новой карточки загрузки
+        // Создание новой карточки загрузки для компактного дизайна
         function createDownloadCard(download) {
             const card = document.createElement('div');
             card.className = 'download-card';
@@ -2531,5 +2907,6 @@
             }
         });
     </script>
+    <script src="downloads-page.js"></script>
 </body>
 </html>
