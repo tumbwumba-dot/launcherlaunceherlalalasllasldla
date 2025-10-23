@@ -1004,7 +1004,7 @@
             color: #666677;
         }
 
-        .download-speed {
+        .download-progress-info span:first-child {
             color: #e91e63;
             font-weight: 600;
         }
@@ -1989,10 +1989,19 @@
         // Функция для возобновления загрузки
         function resumeDownload(downloadId) {
             const download = activeDownloads.get(downloadId);
-            if (!download || (download.state !== 'downloading' && download.state !== 'ready-to-resume' && download.state !== 'error' && download.state !== 'cancelled')) return;
+            if (!download || (download.state !== 'paused' && download.state !== 'error' && download.state !== 'cancelled')) return;
             
             download.status = 'Возобновление...';
             download.state = 'downloading';
+            
+            // Восстанавливаем прогресс если был сохранен
+            if (download.pausedProgress) {
+                download.progress = download.pausedProgress;
+            }
+            if (download.pausedDownloaded) {
+                download.downloaded = download.pausedDownloaded;
+            }
+            
             saveActiveDownloads();
             renderDownloads();
             
@@ -2302,6 +2311,11 @@
             const download = activeDownloads.get(data.downloadId);
             if (!download) return;
             
+            // Если ошибка "aborted" и загрузка была на паузе, не показываем ошибку
+            if (data.error === 'aborted' && download.state === 'paused') {
+                return;
+            }
+            
             download.status = 'Ошибка: ' + data.error;
             download.state = 'error';
             
@@ -2393,6 +2407,7 @@
             
             // Помечаем как отменяемую
             download.status = 'Отмена...';
+            download.state = 'cancelled';
             saveActiveDownloads();
             renderDownloads();
             
@@ -2586,8 +2601,7 @@
                             <div class="download-progress-bar" style="width: ${download.progress || 0}%"></div>
                         </div>
                         <div class="download-progress-info">
-                            <span>${download.downloaded || '0 MB'} / ${download.total || '0 MB'}</span>
-                            <span class="download-speed">${download.speed || '0 MB/s'}</span>
+                            <span>${download.downloaded || '0 MB'} / ${download.total || '0 MB'} • ${download.speed || '0 MB/s'}</span>
                             ${timeRemaining ? `<span class="download-time-remaining">${timeRemaining}</span>` : ''}
                         </div>
                     </div>
@@ -2684,10 +2698,16 @@
         // Новые функции управления загрузками
         function pauseDownload(downloadId) {
             const download = activeDownloads.get(downloadId);
-            if (!download) return;
+            if (!download || download.state !== 'downloading') return;
+            
+            // Сохраняем текущий прогресс
+            download.pausedProgress = download.progress || 0;
+            download.pausedDownloaded = download.downloaded || '0 MB';
             
             download.state = 'paused';
             download.status = 'Приостановлено';
+            download.speed = '0 MB/s';
+            
             saveActiveDownloads();
             renderDownloads();
             
